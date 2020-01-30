@@ -1,0 +1,12 @@
+*.ipch
+*.db
+GXEZ/.vs/GXEZ/v16/.suo
+*.tlog
+*.log
+*.obj
+*.idb
+*.pdb
+*.user
+
+
+*.ilk
