@@ -82,13 +82,16 @@ namespace GXEZ
 	Event::Event(const Type& _type, const ControlKey& _key, const ControlKeyState& _state) : type(_type), key(_key), state(_state)
 	{
 		idDevice = 0;
+		ComputeHash();
 	}
 
 	Event::Event()
 	{
 		idDevice = 0;
+		key = KEY_NONE;
 		type = Event::Type::NONE;
 		state = ControlKeyState::NONE;
+		ComputeHash();
 	}
 
 	Event::Type Event::GetTypeFromControlKey(const ControlKey& key)
@@ -114,16 +117,18 @@ namespace GXEZ
 		return (ControlKeyState::NONE);
 	}
 
-	uint64_t Event::GetHash() const
+	EVENT_TYPE_HASH_ Event::GetHash() const
 	{
-		uint64_t hash;
+		return (hash);
+	}
 
+
+	void Event::ComputeHash()
+	{
 		hash = (uint64_t)idDevice;
 		hash << 32;
 		hash += type;
-		hash += key << 8;
-		hash += state << 24;
-
-		return (hash);
+		hash += (uint64_t)key << 8;
+		hash += (uint64_t)state << 24;
 	}
 }

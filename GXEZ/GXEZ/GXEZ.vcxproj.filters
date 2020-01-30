@@ -62,5 +62,8 @@
     <ClInclude Include="Event\EventHandlerGLFW.h">
       <Filter>Header Files\Event</Filter>
     </ClInclude>
+    <ClInclude Include="Drawer2DVulkan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

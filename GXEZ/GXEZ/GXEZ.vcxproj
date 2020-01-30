@@ -170,6 +170,7 @@
     <ClCompile Include="WindowGLFWVulkan.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Drawer2DVulkan.h" />
     <ClInclude Include="Event\EventHandlerGLFW.h" />
     <ClInclude Include="Event\IEvent.h" />
     <ClInclude Include="Event\IEventHandler.h" />

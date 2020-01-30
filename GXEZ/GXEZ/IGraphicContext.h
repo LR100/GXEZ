@@ -16,9 +16,11 @@ namespace GXEZ
         IGraphicContext() {};
         
         // Basics
-        virtual void        Init() = 0;
-        virtual void        Release() = 0;
+        virtual void            Init() = 0;
+        virtual void            Release() = 0;
         // Windows
-        virtual IWindow*    CreateWindow() = 0;
+        virtual IWindow*        CreateWindow() = 0;
+        // Event Handler
+        virtual IEventHandler*  CreateEventHandler() = 0;
     };
 }

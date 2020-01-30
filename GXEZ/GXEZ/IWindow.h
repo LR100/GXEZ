@@ -39,6 +39,7 @@ namespace GXEZ
 		virtual void				CursorHide(bool state) = 0;
 		virtual void				CursorToCenter() = 0;
 
+		// Event Handler
 		virtual void				LinkEventHandler(IEventHandler* eventHandler) = 0;
 	};
 }

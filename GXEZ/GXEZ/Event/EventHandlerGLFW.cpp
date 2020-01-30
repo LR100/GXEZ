@@ -1,6 +1,6 @@
 #include "EventHandlerGLFW.h"
 
-#include <GLFW/glfw3.h>
+
 
 namespace GXEZ
 {
@@ -61,10 +61,14 @@ namespace GXEZ
 		_keysLink[GLFW_KEY_8] = ControlKey::KEY_NUM8;
 		_keysLink[GLFW_KEY_9] = ControlKey::KEY_NUM9;
 
+		// States //
+		_keyStateLink[GLFW_PRESS] = ControlKeyState::PRESSED;
+		_keyStateLink[GLFW_RELEASE] = ControlKeyState::RELEASED;
+
 		/// MOUSE
 		_mouseLink[GLFW_MOUSE_BUTTON_LEFT] = ControlKey::MOUSE_LEFT;
 		_mouseLink[GLFW_MOUSE_BUTTON_RIGHT] = ControlKey::MOUSE_RIGHT;
-
+		
 		/// WINDOW
 		// TODO:_windowLink[SDL_WINDOWEVENT_MOVED] = ControlKey::WINDOW_MOVE;
 		// TODO:_windowLink[SDL_WINDOWEVENT_CLOSE] = ControlKey::WINDOW_CLOSE;
@@ -92,7 +96,9 @@ namespace GXEZ
 
 	void EventHandlerGLFW::UpdateEvents()
 	{
-		//SDL_Event	event;
+		glfwPollEvents();
+
+		//SDL_Event	evt;
 		//int			mouseX, mouseY;
 
 		//glfwSetUserPointer(window_, this);
@@ -112,95 +118,145 @@ namespace GXEZ
 		//	itpr++;
 		//}
 		////std::cout << "UpdateEvents" << std::endl;;
-		//while (SDL_PollEvent(&event))
+		//while (SDL_PollEvent(&evt))
 		//{
 		//	_evt.key = ControlKey::KEY_NONE;
 		//	_evt.type = Event::Type::NONE;
 		//	_evt.state = ControlKeyState::NONE;
 		//	_evt.idDevice = 0; // No set yet for keyboard and mouses
-		//	if (_typeLink.count(event.type))
-		//		(this->*_typeLink.at(event.type))(event);
+		//	if (_typeLink.count(evt.type))
+		//		(this->*_typeLink.at(evt.type))(evt);
 		//	//std::cout << "Event: " << _evt.ToString();
 
 		//	HandleEvent(_evt.GetHash());
 		//}
 	}
 
-	void EventHandlerGLFW::HandleTypeQuit(const SDL_Event& event)
+	Event EventHandlerGLFW::GetEventFromGLFWEventKey(int key, int scancode, int action, int mods)
 	{
-		/*_evt.type = Event::QUIT;*/
+		ControlKey keycode;
+		if (_keysLink.count(key))
+			keycode = _keysLink.at(key);
+		ControlKeyState keystate;
+		if (_keyStateLink.count(action))
+			keystate = _keyStateLink.at(action);
+		Event evt(Event::GetTypeFromControlKey(keycode), keycode, keystate);
+		return (evt);
 	}
 
-	void EventHandlerGLFW::HandleTypeKeyDown(const SDL_Event& event)
+	void EventHandlerGLFW::TriggerGLFWEventKey(int key, int scancode, int action, int mods)
 	{
-		/*if (_keysLink.count(event.key.keysym.sym))
-			_evt.key = _keysLink.at(event.key.keysym.sym);
-		_evt.type = Event::KEY;
-		_evt.state = ControlKeyState::PRESSED;*/
+		TriggerEvent(GetEventFromGLFWEventKey(key, scancode, action, mods));
 	}
 
-	void EventHandlerGLFW::HandleTypeKeyUp(const SDL_Event& event)
+	void EventHandlerGLFW::TriggerGLFWEventMouseMotion(double x, double y)
 	{
-		/*if (_keysLink.count(event.key.keysym.sym))
-			_evt.key = _keysLink.at(event.key.keysym.sym);
-		_evt.type = Event::KEY;
-		_evt.state = ControlKeyState::RELEASED;*/
+		_mouse.x = x;
+		_mouse.y = y;
+		Event evt;
+		evt.type = Event::MOUSE;
+		evt.key = ControlKey::MOUSE_MOTION;
+		evt.state = Event::GetDefaultControlKeyStateFromControlKey(evt.key);
+		TriggerEvent(evt);
 	}
 
-	void EventHandlerGLFW::HandleTypeMouseWheel(const SDL_Event& event)
+	void EventHandlerGLFW::LinkWindow(GLFWwindow* window)
 	{
-		/*_evt.type = Event::MOUSE;
-		_evt.key = ControlKey::MOUSE_SCROLL;
-		_evt.state = Event::GetDefaultControlKeyStateFromControlKey(_evt.key);
-		_mouse.xScroll = event.wheel.x;
-		_mouse.yScroll = event.wheel.y;*/
+		std::cout << "EventHandlerGLFW::LinkWindow" << std::endl;
+		glfwSetWindowUserPointer(window, this);
+
+		// PROBABLY COULD BE OPTIMIZED BY STORING DIRECTLY A FUNC BY EVENT 
+
+		// Keys //
+		auto funcKey = [](GLFWwindow* w, int key, int scancode, int action, int mods) {
+			static_cast<EventHandlerGLFW*>(glfwGetWindowUserPointer(w))->TriggerGLFWEventKey(key, scancode, action, mods);
+		};
+		glfwSetKeyCallback(window, funcKey);
+
+		// Mouse //
+
+		// Position
+		auto funcMousePos = [](GLFWwindow* w, double x, double y) {
+			static_cast<EventHandlerGLFW*>(glfwGetWindowUserPointer(w))->TriggerGLFWEventMouseMotion(x, y);
+		};
+		glfwSetCursorPosCallback(window, funcMousePos);
 	}
 
-	void EventHandlerGLFW::HandleTypeMouseButtonDown(const SDL_Event& event)
-	{
-		//_evt.type = Event::MOUSE;
-		//if (_mouseLink.count(event.button.button))
-		//	_evt.key = _mouseLink.at(event.button.button);
-		//_evt.state = ControlKeyState::PRESSED;
-		//// Correct Specification of SDL Handling by Retaining mouse pressed
-		////std::cout << "Mouse Down" << std::endl;
-		//_pressedRetainer[_evt.key] = _evt;
-	}
+	//void EventHandlerGLFW::HandleTypeQuit(const SDL_Event& evt)
+	//{
+	//	/*_evt.type = Event::QUIT;*/
+	//}
 
-	void EventHandlerGLFW::HandleTypeMouseButtonUp(const SDL_Event& event)
-	{
-		//_evt.type = Event::MOUSE;
-		//if (_mouseLink.count(event.button.button))
-		//	_evt.key = _mouseLink.at(event.button.button);
-		//// Release Mouse ControlKey Pressed
-		//if (_pressedRetainer.count(_evt.key))
-		//	_pressedRetainer.erase(_evt.key);
-		////std::cout << "Mouse Up" << std::endl;
-		//_evt.state = ControlKeyState::RELEASED;
-	}
+	//void EventHandlerGLFW::HandleTypeKeyDown(const SDL_Event& evt)
+	//{
+	//	/*if (_keysLink.count(evt.key.keysym.sym))
+	//		_evt.key = _keysLink.at(evt.key.keysym.sym);
+	//	_evt.type = Event::KEY;
+	//	_evt.state = ControlKeyState::PRESSED;*/
+	//}
 
-	void EventHandlerGLFW::HandleTypeMouseMotion(const SDL_Event& event)
-	{
-		/*_evt.type = Event::MOUSE;
-		_evt.key = ControlKey::MOUSE_MOTION;
-		_evt.state = Event::GetDefaultControlKeyStateFromControlKey(_evt.key);*/
-	}
+	//void EventHandlerGLFW::HandleTypeKeyUp(const SDL_Event& evt)
+	//{
+	//	/*if (_keysLink.count(evt.key.keysym.sym))
+	//		_evt.key = _keysLink.at(evt.key.keysym.sym);
+	//	_evt.type = Event::KEY;
+	//	_evt.state = ControlKeyState::RELEASED;*/
+	//}
 
-	void EventHandlerGLFW::HandleTypeWindow(const SDL_Event& event)
-	{
-		//_evt.type = Event::WINDOW;
-		//_evt.idDevice = event.window.windowID;
-		//if (_windowLink.count(event.window.event))
-		//{
-		//	_evt.key = _windowLink.at(event.window.event);
-		//	_evt.state = Event::GetDefaultControlKeyStateFromControlKey(_evt.key);
-		//}
-		//// !! HANDLE EVENT WITH ID DEVICE !!
-		//HandleEvent(_evt.GetHash());
-		//// Then Set It for Handling WITHOUT Id Device
-		//// This Procedure allow the user of EventHandler 
-		//// to handle any kind of Window Event whatever the window it is
-		//_evt.idDevice = 0;
-	}
+	//void EventHandlerGLFW::HandleTypeMouseWheel(const SDL_Event& evt)
+	//{
+	//	/*_evt.type = Event::MOUSE;
+	//	_evt.key = ControlKey::MOUSE_SCROLL;
+	//	_evt.state = Event::GetDefaultControlKeyStateFromControlKey(_evt.key);
+	//	_mouse.xScroll = evt.wheel.x;
+	//	_mouse.yScroll = evt.wheel.y;*/
+	//}
+
+	//void EventHandlerGLFW::HandleTypeMouseButtonDown(const SDL_Event& evt)
+	//{
+	//	//_evt.type = Event::MOUSE;
+	//	//if (_mouseLink.count(evt.button.button))
+	//	//	_evt.key = _mouseLink.at(evt.button.button);
+	//	//_evt.state = ControlKeyState::PRESSED;
+	//	//// Correct Specification of SDL Handling by Retaining mouse pressed
+	//	////std::cout << "Mouse Down" << std::endl;
+	//	//_pressedRetainer[_evt.key] = _evt;
+	//}
+
+	//void EventHandlerGLFW::HandleTypeMouseButtonUp(const SDL_Event& evt)
+	//{
+	//	//_evt.type = Event::MOUSE;
+	//	//if (_mouseLink.count(evt.button.button))
+	//	//	_evt.key = _mouseLink.at(evt.button.button);
+	//	//// Release Mouse ControlKey Pressed
+	//	//if (_pressedRetainer.count(_evt.key))
+	//	//	_pressedRetainer.erase(_evt.key);
+	//	////std::cout << "Mouse Up" << std::endl;
+	//	//_evt.state = ControlKeyState::RELEASED;
+	//}
+
+	//void EventHandlerGLFW::HandleTypeMouseMotion(const SDL_Event& evt)
+	//{
+	//	/*_evt.type = Event::MOUSE;
+	//	_evt.key = ControlKey::MOUSE_MOTION;
+	//	_evt.state = Event::GetDefaultControlKeyStateFromControlKey(_evt.key);*/
+	//}
+
+	//void EventHandlerGLFW::HandleTypeWindow(const SDL_Event& evt)
+	//{
+	//	//_evt.type = Event::WINDOW;
+	//	//_evt.idDevice = evt.window.windowID;
+	//	//if (_windowLink.count(evt.window.evt))
+	//	//{
+	//	//	_evt.key = _windowLink.at(evt.window.evt);
+	//	//	_evt.state = Event::GetDefaultControlKeyStateFromControlKey(_evt.key);
+	//	//}
+	//	//// !! HANDLE EVENT WITH ID DEVICE !!
+	//	//HandleEvent(_evt.GetHash());
+	//	//// Then Set It for Handling WITHOUT Id Device
+	//	//// This Procedure allow the user of EventHandler 
+	//	//// to handle any kind of Window Event whatever the window it is
+	//	//_evt.idDevice = 0;
+	//}
 
 }

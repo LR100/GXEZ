@@ -49,6 +49,9 @@ namespace GXEZ
 		virtual void				CursorHide(bool state) override;
 		virtual void				CursorToCenter() override;
 
+		// Events
+		virtual void				LinkEventHandler(IEventHandler* eventHandler) override;
+
 	protected:
 
 		// Init For Construction
@@ -61,6 +64,8 @@ namespace GXEZ
 
 		unsigned int	_width, _height;
 		uint32_t		_id;
+
+		IEventHandler*	_eventHandler;
 
 		// GLFW part
 		GLFWwindow*		_window;

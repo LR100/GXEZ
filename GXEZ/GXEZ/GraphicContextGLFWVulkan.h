@@ -2,6 +2,7 @@
 
 #include "IGraphicContext.h"
 #include "WindowGLFWVulkan.h"
+#include "Event/EventHandlerGLFW.h"
 
 #include <iostream>
 
@@ -33,5 +34,11 @@ namespace GXEZ
         {
             return (new WindowGLFWVulkan());
         }
+
+        virtual IEventHandler* CreateEventHandler() override
+        {
+            return (new EventHandlerGLFW());
+        }
+
     };
 }

@@ -8,6 +8,29 @@ namespace GXEZ
 		_curPriority = Priority::MEDIUM;
 	}
 
+	void IEventHandler::TriggerEvent(ControlKey key)
+	{
+		Event event(Event::GetTypeFromControlKey(key), key, Event::GetDefaultControlKeyStateFromControlKey(key));
+		TriggerEvent(event);
+	}
+
+	void IEventHandler::TriggerEvent(ControlKey key, ControlKeyState state)
+	{
+		Event event(Event::GetTypeFromControlKey(key), key, state);
+		TriggerEvent(event);
+	}
+
+	void IEventHandler::TriggerEvent(Event::Type type, ControlKey key, ControlKeyState state)
+	{
+		Event event(type, key, state);
+		TriggerEvent(event);
+	}
+
+	void IEventHandler::TriggerEvent(const Event& event)
+	{
+		HandleEvent(event.GetHash());
+	}
+
 	void IEventHandler::SetPriority(Priority priority)
 	{
 		_curPriority = priority;
@@ -16,7 +39,7 @@ namespace GXEZ
 	void IEventHandler::Clear()
 	{
 		_handlers.clear();
-		_handlers = _handlersPermanent;
+		_handlers = _handlersPermanent; 
 	}
 
 	const Mouse* IEventHandler::GetMouse() const
@@ -34,7 +57,7 @@ namespace GXEZ
 			// Do Work
 			for (size_t i = 0; i < workList->_works.size(); i += 1)
 			{
-				//std::cout << "HandleEvent (" << idevent << ")" << std::endl;
+				std::cout << "HandleEvent (" << idevent << ")" << std::endl;
 				workList->_works.at(i)._function();
 			}
 		}

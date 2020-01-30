@@ -3,14 +3,52 @@
 
 #include "GraphicEnvironment.h"
 
+using namespace GXEZ;
+
+class Program
+{
+public :
+
+    void Init()
+    {
+        _window = graphicContext->CreateWindow();
+        _eventHandler = graphicContext->CreateEventHandler();
+        _window->Open(800, 600, "Vulkan window");
+        _window->LinkEventHandler(_eventHandler);
+        _eventHandler->AddHandlerToEvent(ControlKey::KEY_ESCAPE, ControlKeyState::RELEASED, &Program::Quit, this);
+    }
+
+    void Loop()
+    {
+        while (_window->IsOpen())
+        {
+            _eventHandler->UpdateEvents();
+            _window->Refresh();
+        }
+    }
+
+    void Quit()
+    {
+        _window->Close();
+    }
+
+private:
+
+    GXEZ::GraphicEnvironment&   graphicEnv = GXEZ::GraphicEnvironment::Get();
+    GXEZ::IGraphicContext*      graphicContext = graphicEnv.GetContext();
+    GXEZ::IEventHandler*        _eventHandler;
+    GXEZ::IWindow*              _window;
+};
+
 int main()
 {
-    GXEZ::GraphicEnvironment&   graphicEnv = GXEZ::GraphicEnvironment::Get();
-    GXEZ::IGraphicContext* graphicContext = graphicEnv.GetContext();
-    GXEZ::IWindow* window = graphicContext->CreateWindow();
+   
+    Program program;
 
-
-    window->Open(800, 600, "Vulkan window");
+    program.Init();
+    program.Loop();
+    program.Quit();
+    
 
     
     

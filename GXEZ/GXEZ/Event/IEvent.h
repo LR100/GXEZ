@@ -85,8 +85,8 @@ namespace GXEZ
 		Event(const Type& _type, const ControlKey& _key, const ControlKeyState& _state);
 		Event();
 
-		static Event::Type GetTypeFromControlKey(const ControlKey& key);
-		static ControlKeyState GetDefaultControlKeyStateFromControlKey(const ControlKey& key);
+		static Event::Type		GetTypeFromControlKey(const ControlKey& key);
+		static ControlKeyState	GetDefaultControlKeyStateFromControlKey(const ControlKey& key);
 
 #define EVENT_TYPE_HASH_ uint64_t
 
@@ -97,6 +97,10 @@ namespace GXEZ
 		ControlKey					key;
 		ControlKeyState				state;
 		uint32_t					idDevice; // For Multiple GamePad / KeyBoard
+
+	private:
+		void						ComputeHash();
+		EVENT_TYPE_HASH_			hash;
 	};
 
 }

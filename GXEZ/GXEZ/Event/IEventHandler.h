@@ -12,7 +12,7 @@
 // The Event Handler is capable of handling all type of Events:
 // - keyboard (up/down..)
 // - mouse (motion, scroll, click, ..)
-// - window events (resize, focus, close)   (btw for window its possible to link an eventhandler to communicate with them)
+// - or for exemple : window events (resize, focus, close)   (btw for window its possible to link an eventhandler to communicate with them)
 
 // Events have an idDevice so is it possible to handle multiples devices of the same type
 
@@ -24,7 +24,7 @@ namespace GXEZ
 
 		enum Priority
 		{
-			PERMANENT = 0,
+			PERMANENT = 0, // Handlers For This Event REMAIN in the EventHandler even the method clear is called !
 			HIGH = 1,
 			MEDIUM = 2,
 			LOW
@@ -36,10 +36,14 @@ namespace GXEZ
 
 		// Virtual
 		virtual void	UpdateEvents() = 0;
+		virtual void	TriggerEvent(ControlKey key);
+		virtual void	TriggerEvent(ControlKey key, ControlKeyState state);
+		virtual void	TriggerEvent(Event::Type type, ControlKey key, ControlKeyState state);
+		virtual void	TriggerEvent(const Event& event);
 
 		// Tools
 		void			SetPriority(Priority priority);
-		const Mouse* GetMouse() const;
+		const Mouse*	GetMouse() const;
 
 		// Handler Add
 		template <class Function, class ...Args>
@@ -71,7 +75,6 @@ namespace GXEZ
 
 		// Remove All Handlers (except PERMANENT)
 		void			Clear();
-
 
 
 	protected:
