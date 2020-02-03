@@ -1,9 +1,14 @@
 // GXEZ.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-#include "GraphicEnvironment.h"
+#include "Graphic/GraphicEnvironment.h"
+
+#include <Windows.h>
 
 using namespace GXEZ;
+#ifdef CreateWindow
+#undef CreateWindow
+#endif
 
 class Program
 {
@@ -16,6 +21,7 @@ public :
         _window->Open(800, 600, "Vulkan window");
         _window->LinkEventHandler(_eventHandler);
         _eventHandler->AddHandlerToEvent(ControlKey::KEY_ESCAPE, ControlKeyState::RELEASED, &Program::Quit, this);
+        _eventHandler->AddHandlerToEvent(ControlKey::KEY_F, ControlKeyState::RELEASED, &Program::FullScreen, this);
     }
 
     void Loop()
@@ -24,6 +30,7 @@ public :
         {
             _eventHandler->UpdateEvents();
             _window->Refresh();
+            Sleep(10);
         }
     }
 
@@ -33,6 +40,11 @@ public :
     }
 
 private:
+
+    void FullScreen()
+    {
+        _window->SetFullScreen(true);
+    }
 
     GXEZ::GraphicEnvironment&   graphicEnv = GXEZ::GraphicEnvironment::Get();
     GXEZ::IGraphicContext*      graphicContext = graphicEnv.GetContext();

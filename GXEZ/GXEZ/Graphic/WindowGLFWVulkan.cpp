@@ -1,5 +1,5 @@
 #include "WindowGLFWVulkan.h"
-#include "Event/EventHandlerGLFW.h"
+#include "../Event/EventHandlerGLFW.h"
 
 #include <iostream>
 
@@ -19,28 +19,27 @@ namespace GXEZ
 		Open(width, height, name);
 	}
 
-	//WindowGLFWVulkan::WindowGLFWVulkan(IEventHandler * eHandler, unsigned int width, unsigned int height, const std::string & name)
-	//{
-	//	InitBasics();
-	//	Open(width, height, name);
-	//	SetEventHandler(eHandler);
-	//}
+	WindowGLFWVulkan::WindowGLFWVulkan(IEventHandler* eHandler, unsigned int width, unsigned int height, const std::string& name)
+	{
+		InitBasics();
+		Open(width, height, name);
+		LinkEventHandler(eHandler);
+	}
 
 	WindowGLFWVulkan::~WindowGLFWVulkan()
 	{
-		//BGContext//SDL::Get().NotifyDeletedItem();
+		Close();
 	}
 
 	void WindowGLFWVulkan::InitBasics()
 	{
-
-		// BGContext//SDL::Get().NotifyCreatedItem();
-		// _linkedEventHandler = NULL;
+		_eventHandler = NULL;
 		_window = NULL;
 		_open = false;
 		_id = 0;
 		_showCursor = true;
 		_borderless = false;
+		_fullscreen = false;
 	}
 
 	//void WindowGLFWVulkan::SetEventHandler(IEventHandler * eHandler)
@@ -125,6 +124,7 @@ namespace GXEZ
 		if (_window)
 		{
 			glfwFocusWindow(_window);
+			_focus = true;
 		}
 	}
 
@@ -134,7 +134,7 @@ namespace GXEZ
 		{
 			_width = width;
 			_height = height;
-			//SDL_SetWindowSize(_window, width, height);
+			glfwSetWindowSize(_window, width, height);
 		}
 	}
 
@@ -142,8 +142,7 @@ namespace GXEZ
 	{
 		if (_window)
 		{
-
-			//SDL_SetWindowPosition(_window, x, y);
+			glfwSetWindowPos(_window, x, y);
 		}
 	}
 
@@ -151,7 +150,11 @@ namespace GXEZ
 	{
 		if (_window)
 		{
-			//SDL_UpdateWindowSurface(_window);
+			// Check if window should close
+			if (glfwWindowShouldClose(_window)) {
+				Close();
+			}
+			// And update Vulkan Surface if needed
 		}
 	}
 
@@ -184,8 +187,40 @@ namespace GXEZ
 	{
 		_borderless = state;
 		if (_window) {
+
 			//SDL_SetWindowBordered(_window, (//SDL_bool)!_borderless);
 		}
+	}
+
+	bool WindowGLFWVulkan::IsBorderless() const
+	{
+		return (_borderless);
+	}
+
+	void WindowGLFWVulkan::SetFullScreen(bool state)
+	{
+		if (_fullscreen != state)
+		{
+			_fullscreen = state;
+			if (_fullscreen)
+			{
+				GLFWmonitor* monitor = glfwGetWindowMonitor(_window);
+				if (monitor) {
+					const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+					if (mode) {
+						glfwSetWindowMonitor(_window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+					}
+				}
+			}
+			else {
+
+			}
+		}
+	}
+
+	bool WindowGLFWVulkan::IsFullScreen() const
+	{
+		return (_fullscreen);
 	}
 
 	void WindowGLFWVulkan::CursorHide(bool state)
@@ -202,11 +237,15 @@ namespace GXEZ
 	{
 		_eventHandler = eventHandler;
 
-		EventHandlerGLFW*	eventHandlerGLFW = dynamic_cast<EventHandlerGLFW*>(eventHandler);
-		if (eventHandlerGLFW != NULL)
-		{
+		EventHandlerGLFW* eventHandlerGLFW = dynamic_cast<EventHandlerGLFW*>(eventHandler);
+		if (eventHandlerGLFW != NULL) {
 			eventHandlerGLFW->LinkWindow(_window);
 		}
+	}
+
+	void WindowGLFWVulkan::LinkDrawer2D(IDrawer2D* drawer)
+	{
+		// Link Window in Swap Chain ???
 	}
 
 }

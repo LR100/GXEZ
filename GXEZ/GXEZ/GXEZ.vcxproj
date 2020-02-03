@@ -166,19 +166,31 @@
     <ClCompile Include="Event\EventHandlerGLFW.cpp" />
     <ClCompile Include="Event\IEvent.cpp" />
     <ClCompile Include="Event\IEventHandler.cpp" />
+    <ClCompile Include="Graphic\DImage.cpp" />
+    <ClCompile Include="Graphic\GraphicContextGLFWVulkan.cpp" />
+    <ClCompile Include="Graphic\IGraphicContext.cpp" />
+    <ClCompile Include="Graphic\IImage.cpp" />
+    <ClCompile Include="Graphic\WindowGLFWVulkan.cpp" />
     <ClCompile Include="GXEZ.cpp" />
-    <ClCompile Include="WindowGLFWVulkan.cpp" />
+    <ClCompile Include="Tools\XMLNode.cpp" />
+    <ClCompile Include="Tools\XMLParser.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Drawer2DVulkan.h" />
     <ClInclude Include="Event\EventHandlerGLFW.h" />
     <ClInclude Include="Event\IEvent.h" />
     <ClInclude Include="Event\IEventHandler.h" />
-    <ClInclude Include="GraphicContextGLFWVulkan.h" />
-    <ClInclude Include="GraphicEnvironment.h" />
-    <ClInclude Include="IGraphicContext.h" />
-    <ClInclude Include="IWindow.h" />
-    <ClInclude Include="WindowGLFWVulkan.h" />
+    <ClInclude Include="Graphic\DImage.h" />
+    <ClInclude Include="Graphic\Drawer2DVulkan.h" />
+    <ClInclude Include="Graphic\GraphicContextGLFWVulkan.h" />
+    <ClInclude Include="Graphic\GraphicEnvironment.h" />
+    <ClInclude Include="Graphic\IDrawer2D.h" />
+    <ClInclude Include="Graphic\IGraphicContext.h" />
+    <ClInclude Include="Graphic\IImage.h" />
+    <ClInclude Include="Graphic\IWindow.h" />
+    <ClInclude Include="Graphic\WindowGLFWVulkan.h" />
+    <ClInclude Include="Tools\LinkedList.hpp" />
+    <ClInclude Include="Tools\XMLNode.h" />
+    <ClInclude Include="Tools\XMLParser.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -10,3 +10,6 @@ GXEZ/.vs/GXEZ/v16/.suo
 
 
 *.ilk
+*.opendb
+*.exe
+GXEZ/Debug/GXEZ.exe

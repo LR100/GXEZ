@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IWindow.h"
+#include "IDrawer2D.h"
 
 namespace GXEZ
 {
@@ -22,5 +23,7 @@ namespace GXEZ
         virtual IWindow*        CreateWindow() = 0;
         // Event Handler
         virtual IEventHandler*  CreateEventHandler() = 0;
+        // Drawer
+        virtual IDrawer2D*      CreateDrawer2D() = 0;
     };
 }

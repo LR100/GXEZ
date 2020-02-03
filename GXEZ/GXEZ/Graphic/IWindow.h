@@ -4,7 +4,8 @@
 #include <stdint.h>
 #include <string>
 
-#include "Event/IEventHandler.h" // To link windows events to an eventhandler
+#include "../Event/IEventHandler.h" // To link windows events to an eventhandler
+#include "IDrawer2D.h"
 
 namespace GXEZ
 {
@@ -17,14 +18,17 @@ namespace GXEZ
 		virtual bool				Open(unsigned int width, unsigned int height, const std::string & = "Default Window Name") = 0;
 		virtual bool				IsOpen() const = 0;
 		virtual void				Close() = 0;
+		// Focus
 		virtual bool				IsFocus() const = 0;
 		virtual void				Focus() = 0;
 
 		// Screen
 		virtual void				Resize(const unsigned int& width, const unsigned int& height) = 0;
 		virtual void				SetPosition(const int& x, const int& y) = 0;
+
 		virtual void				Refresh() = 0;
 
+		// Size
 		virtual const unsigned int& GetWidth() const = 0;
 		virtual const unsigned int& GetHeight() const = 0;
 
@@ -34,6 +38,9 @@ namespace GXEZ
 
 		// Property
 		virtual void				SetBorderless(bool state) = 0;
+		virtual bool				IsBorderless() const = 0;
+		virtual void				SetFullScreen(bool state) = 0;
+		virtual bool				IsFullScreen() const = 0;
 
 		// Mouse
 		virtual void				CursorHide(bool state) = 0;
@@ -41,6 +48,8 @@ namespace GXEZ
 
 		// Event Handler
 		virtual void				LinkEventHandler(IEventHandler* eventHandler) = 0;
+		// Drawer
+		virtual void				LinkDrawer2D(IDrawer2D* drawer) = 0;
 	};
 }
 

@@ -34,7 +34,7 @@ namespace GXEZ
             }
             else if (context_type == IGraphicContext::Type::GRAPHIC_CONTEXT_TYPE_GLFW_VULKAN) {
                 // Load GLFW Vulkan Environement
-                _context = (IGraphicContext*)new GraphicContextGLFWVulkan();
+                _context = (IGraphicContext*)GraphicContextGLFWVulkan::Get();
             }
             else {
                 _context = NULL;
@@ -49,6 +49,7 @@ namespace GXEZ
         }
 
         IGraphicContext*            _context;
+        // THIS - Singleton Instance
         static GraphicEnvironment   _singleton;
     };
 

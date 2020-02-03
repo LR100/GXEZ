@@ -14,12 +14,10 @@ namespace GXEZ
 
 		WindowGLFWVulkan();
 		WindowGLFWVulkan(unsigned int width, unsigned int height, const std::string& name = "Default Window Name");
-		//WindowGLFWVulkan(IEventHandler* eHandler, unsigned int width, unsigned int height, const std::string& name = "Default Window Name");
+		WindowGLFWVulkan(IEventHandler* eHandler, unsigned int width, unsigned int height, const std::string& name = "Default Window Name");
 
 		~WindowGLFWVulkan();
 
-		// EventHandler
-		//void	SetEventHandler(IEventHandler* eHandler);
 
 		/// Hérité via IWindow
 		// Basics
@@ -37,13 +35,17 @@ namespace GXEZ
 		virtual const unsigned int& GetWidth() const override;
 		virtual const unsigned int& GetHeight() const override;
 
-		/*virtual IImage* GetBackBuffer() const override;
+		/*
+		virtual IImage* GetBackBuffer() const override;
 		virtual const ColorFormat& GetColorFormat() const override;
 		*/
 		virtual const uint32_t&		GetID() const override;
 
 		// Property
 		virtual void				SetBorderless(bool state) override;
+		virtual bool				IsBorderless() const override;
+		virtual void				SetFullScreen(bool state) override;
+		virtual bool				IsFullScreen() const override;
 
 		// Mouse
 		virtual void				CursorHide(bool state) override;
@@ -51,6 +53,10 @@ namespace GXEZ
 
 		// Events
 		virtual void				LinkEventHandler(IEventHandler* eventHandler) override;
+
+		// Drawer
+		virtual void				LinkDrawer2D(IDrawer2D* drawer) override;
+
 
 	protected:
 
@@ -60,6 +66,7 @@ namespace GXEZ
 		bool			_open;
 		bool			_showCursor;
 		bool			_focus;
+		bool			_fullscreen;
 		bool			_borderless;
 
 		unsigned int	_width, _height;
