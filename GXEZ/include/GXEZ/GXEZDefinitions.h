@@ -1,0 +1,8 @@
+#ifndef GXEZ_DEFINITIONS_H_
+#define GXEZ_DEFINITIONS_H_
+
+#define GXEZ_GLFW_VULKAN 0
+#define GXEZ_SDL 1
+
+#endif // !GXEZ_DEFINITIONS_H_
+
