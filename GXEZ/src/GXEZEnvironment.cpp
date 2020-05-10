@@ -12,7 +12,7 @@
 
 namespace GXEZ
 {
-	GXEZEnvironment GXEZEnvironment::_singleton(IGXEZContext::Type::GRAPHIC_CONTEXT_TYPE_SDL2);
+	GXEZEnvironment GXEZEnvironment::_singleton(IGXEZContext::Type::GRAPHIC_CONTEXT_TYPE_SDL2_RENDERER);
 
 	GXEZEnvironment::GXEZEnvironment(IGXEZContext::Type context_type)
 	{
@@ -21,13 +21,13 @@ namespace GXEZ
 
 	void GXEZEnvironment::Init(IGXEZContext::Type context_type)
 	{
-		if (context_type == IGXEZContext::Type::GRAPHIC_CONTEXT_TYPE_SDL2) {
+		if (context_type == IGXEZContext::Type::GRAPHIC_CONTEXT_TYPE_SDL2_RENDERER || context_type == IGXEZContext::Type::GRAPHIC_CONTEXT_TYPE_SDL2_DRAWER) {
 			// Load SDL2 Environment
 #if GXEZ_SDL
-			_context = (IGXEZContext*)GXEZContextSDL::Get();
+			_context = (IGXEZContext*)GXEZContextSDL::Get(context_type);
 #endif // GXEZ_SDL
 		}
-		else if (context_type == IGXEZContext::Type::GRAPHIC_CONTEXT_TYPE_GLFW_VULKAN) {
+		else if (context_type == IGXEZContext::Type::GRAPHIC_CONTEXT_TYPE_GLFW_VULKAN_RENDERER) {
 			// Load GLFW Vulkan Environement
 #if GXEZ_GLFW_VULKAN
 				//_context = (IGXEZContext*)GXEZContextGLFWVulkan::Get();

@@ -5,7 +5,7 @@
 #include <string>
 
 #include "GXEZ/Event/IEventHandler.h" // To link windows events to an eventhandler
-#include "GXEZ/Graphic/IDrawer2D.h"
+#include "GXEZ/Graphic/IImageDrawer2D.h"
 
 namespace GXEZ
 {
@@ -49,8 +49,9 @@ namespace GXEZ
 		// Event Handler
 		virtual void				LinkEventHandler(IEventHandler* eventHandler) = 0;
 		// Drawer
-		virtual void				LinkDrawer2D(IDrawer2D* drawer) = 0;
-		virtual void				UseDrawer2D() = 0;
+		virtual void				LinkImageDrawer2D(IImageDrawer2D* drawer) = 0;
+		virtual void				UseImageDrawer2D() = 0;
+		virtual const ColorFormat&	GetColorFormat() const = 0;
 	};
 }
 

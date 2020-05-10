@@ -61,7 +61,7 @@ namespace GXEZ
 		virtual void				LinkEventHandler(IEventHandler* eventHandler) override;
 
 		// Drawer
-		virtual void				LinkDrawer2D(IDrawer2D* drawer) override;
+		virtual void				LinkImageDrawer2D(IImageDrawer2D* drawer) override;
 
 
 		//////////

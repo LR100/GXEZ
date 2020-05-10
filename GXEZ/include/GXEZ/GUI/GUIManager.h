@@ -69,7 +69,7 @@ namespace GXEZ
 		// Basics
 		unsigned int			_width, _height;
 		IEventHandler* _eventHandler;
-		IDrawer2D* _drawer2D;
+		IDrawer2D*	 _drawer2D;
 	};
 
 }

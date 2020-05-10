@@ -1,7 +1,7 @@
 // GXEZ
 #include "GXEZ/Graphic/SDL/WindowSDL.h"
 #include "GXEZ/SDL/GXEZContextSDL.h"
-#include "GXEZ/Graphic/SDL/Drawer2DSDL.h"
+#include "GXEZ/Graphic/SDL/ImageDrawer2DSDL.h"
 
 
 // STD
@@ -11,19 +11,19 @@ namespace GXEZ
 {
 	WindowSDL::WindowSDL(GXEZContextSDL* context)
 	{
-		InitBasics();
+		InitBasics(context);
 		Open(500, 500);
 	}
 
 	WindowSDL::WindowSDL(GXEZContextSDL* context, unsigned int width, unsigned int height, const std::string& name)
 	{
-		InitBasics();
+		InitBasics(context);
 		Open(width, height, name);
 	}
 
 	WindowSDL::WindowSDL(GXEZContextSDL* context, IEventHandler* eHandler, unsigned int width, unsigned int height, const std::string& name)
 	{
-		InitBasics();
+		InitBasics(context);
 		Open(width, height, name);
 		LinkEventHandler(eHandler);
 	}
@@ -32,8 +32,11 @@ namespace GXEZ
 	{
 	}
 
-	void WindowSDL::InitBasics()
+	void WindowSDL::InitBasics(GXEZContextSDL* context)
 	{
+		_renderer = NULL;
+		_drawer = NULL;
+		_context = context;
 		_linkedEventHandler = NULL;
 		_window = NULL;
 		_open = false;
@@ -58,8 +61,8 @@ namespace GXEZ
 		{
 			_width = width;
 			_height = height;
-			_window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-				width, height,  /* SDL_WINDOW_FULLSCREEN | */ /* SDL_WINDOW_BORDERLESS */ SDL_WINDOW_RESIZABLE);
+			_window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+				width, height, SDL_WINDOW_RESIZABLE);
 			if (this->_window == NULL)
 			{
 				std::cerr << "SDL: Unable to create window: " << SDL_GetError() << std::endl;
@@ -108,6 +111,10 @@ namespace GXEZ
 				delete (_buffer);
 				_buffer = NULL;
 			}
+			if (_renderer) {
+				SDL_DestroyRenderer(_renderer);
+				_renderer = NULL;
+			}
 		}
 	}
 
@@ -142,7 +149,7 @@ namespace GXEZ
 
 	void WindowSDL::Refresh()
 	{
-		if (_window)
+		if (_window && !_renderer)
 			SDL_UpdateWindowSurface(_window);
 	}
 
@@ -156,14 +163,29 @@ namespace GXEZ
 		return (_height);
 	}
 
-	IImage* WindowSDL::GetBackBuffer() const
+	const ColorFormat& WindowSDL::GetColorFormat() const
+	{
+		return (_format);
+	}
+
+	ImageSDL* WindowSDL::GetSDLBackBuffer() const
 	{
 		return (_buffer);
 	}
 
-	const ColorFormat& WindowSDL::GetColorFormat() const
+	SDL_Window* WindowSDL::GetSDLWindow() const
 	{
-		return (_format);
+		return (_window);
+	}
+
+	void WindowSDL::SetSDLRenderer(SDL_Renderer* renderer)
+	{
+		_renderer = renderer;
+	}
+
+	SDL_Renderer* WindowSDL::GetSDLRenderer() const
+	{
+		return (_renderer);
 	}
 
 	const uint32_t& WindowSDL::GetID() const
@@ -230,16 +252,16 @@ namespace GXEZ
 		_linkedEventHandler->SetPriority(IEventHandler::Priority::MEDIUM);
 	}
 
-	void WindowSDL::LinkDrawer2D(IDrawer2D* drawer)
+	void WindowSDL::LinkImageDrawer2D(IImageDrawer2D* drawer)
 	{
 		// Only a drawer2D SDL is managed for the moment
-		_drawer = dynamic_cast<Drawer2DSDL*>(drawer);
+		_drawer = dynamic_cast<ImageDrawer2DSDL*>(drawer);
 	}
 
-	void WindowSDL::UseDrawer2D()
+	void WindowSDL::UseImageDrawer2D()
 	{
 		if (_drawer) {
-			_drawer->SetCurrentImage(GetBackBuffer());
+			_drawer->SetCurrentImage(GetSDLBackBuffer());
 		}
 	}
 

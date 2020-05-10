@@ -162,12 +162,12 @@ namespace GXEZ
 		_itemsClicked.clear();
 	}
 
-	GUIManager::GUIScreen::GUIScreen(GUIManager* manager, IDrawer2D* drawer, const GUIItem::Definition& definition) : GUIItem(NULL, NULL, drawer, GUIItem::ItemType::NONE, definition)
+	GUIManager::GUIScreen::GUIScreen(GUIManager* manager, IImageDrawer2D* drawer, const GUIItem::Definition& definition) : GUIItem(NULL, NULL, drawer, GUIItem::ItemType::NONE, definition)
 	{
 		GUIItem::SetDefinition(definition);
 	}
 
-	void GUIManager::GUIScreen::OnDraw(IDrawer2D* drawer)
+	void GUIManager::GUIScreen::OnDraw(IImageDrawer2D* drawer)
 	{
 	}
 

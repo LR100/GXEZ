@@ -35,15 +35,17 @@
     <ClInclude Include="include\GXEZ\Graphic\ColorDefines.h" />
     <ClInclude Include="include\GXEZ\Graphic\ColorDefinitions.h" />
     <ClInclude Include="include\GXEZ\Graphic\DImage.h" />
+    <ClInclude Include="include\GXEZ\Graphic\IDrawer2D.h" />
     <ClInclude Include="include\GXEZ\Graphic\IRenderer.h" />
+    <ClInclude Include="include\GXEZ\Graphic\SDL\RendererSDL.h" />
     <ClInclude Include="include\GXEZ\GUI\GUIItem.h" />
     <ClInclude Include="include\GXEZ\GUI\GUIManager.h" />
     <ClInclude Include="include\GXEZ\GXEZEnvironment.h" />
-    <ClInclude Include="include\GXEZ\Graphic\IDrawer2D.h" />
+    <ClInclude Include="include\GXEZ\Graphic\IImageDrawer2D.h" />
     <ClInclude Include="include\GXEZ\IGXEZContext.h" />
     <ClInclude Include="include\GXEZ\Graphic\IImage.h" />
     <ClInclude Include="include\GXEZ\Graphic\IWindow.h" />
-    <ClInclude Include="include\GXEZ\Graphic\SDL\Drawer2DSDL.h" />
+    <ClInclude Include="include\GXEZ\Graphic\SDL\ImageDrawer2DSDL.h" />
     <ClInclude Include="include\GXEZ\SDL\GXEZContextSDL.h" />
     <ClInclude Include="include\GXEZ\Graphic\SDL\ImageSDL.h" />
     <ClInclude Include="include\GXEZ\Graphic\SDL\WindowSDL.h" />
@@ -55,6 +57,7 @@
     <ClInclude Include="include\GXEZ\Tool\Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Graphic\SDL\RendererSDL.cpp" />
     <ClCompile Include="src\Graphic\IDrawer2D.cpp" />
     <ClCompile Include="src\Event\GLFW\EventHandlerGLFW.cpp" />
     <ClCompile Include="src\Event\IEvent.cpp" />
@@ -67,7 +70,7 @@
     <ClCompile Include="src\GUI\GUIManager.cpp" />
     <ClCompile Include="src\GXEZEnvironment.cpp" />
     <ClCompile Include="src\Graphic\IImage.cpp" />
-    <ClCompile Include="src\Graphic\SDL\Drawer2DSDL.cpp" />
+    <ClCompile Include="src\Graphic\SDL\ImageDrawer2DSDL.cpp" />
     <ClCompile Include="src\SDL\GXEZContextSDL.cpp" />
     <ClCompile Include="src\Graphic\SDL\ImageSDL.cpp" />
     <ClCompile Include="src\Graphic\SDL\WindowSDL.cpp" />

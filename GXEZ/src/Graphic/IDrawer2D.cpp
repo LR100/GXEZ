@@ -1,9 +1,9 @@
-#include "GXEZ/Graphic/IDrawer2D.h"
+#include "GXEZ/Graphic/IImageDrawer2D.h"
 
 namespace GXEZ
 {
 
-	IDrawer2D::Circle::Circle()
+	IImageDrawer2D::Circle::Circle()
 	{
 		thickness = 1;
 		diameter = 2;
@@ -11,7 +11,7 @@ namespace GXEZ
 		part = Circle::Part::FULL;
 	}
 
-	IDrawer2D::Circle::Circle(unsigned int _diameter, Color _color, unsigned int _thickness, Circle::Part _part)
+	IImageDrawer2D::Circle::Circle(unsigned int _diameter, Color _color, unsigned int _thickness, Circle::Part _part)
 	{
 		part = _part;
 		thickness = _thickness;
@@ -19,7 +19,7 @@ namespace GXEZ
 		color = _color;
 	}
 
-	IDrawer2D::Rect::Rect()
+	IImageDrawer2D::Rect::Rect()
 	{
 		width = 0;
 		height = 0;
@@ -27,7 +27,7 @@ namespace GXEZ
 		radiusType = UnitDraw::ABSOLUTE_PX;
 	}
 
-	IDrawer2D::Rect::Rect(unsigned int _width, unsigned int _height, Color _color)
+	IImageDrawer2D::Rect::Rect(unsigned int _width, unsigned int _height, Color _color)
 	{
 		width = _width;
 		height = _height;

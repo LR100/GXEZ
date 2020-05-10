@@ -27,9 +27,6 @@
     <ClInclude Include="include\GXEZ\Graphic\DImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\GXEZ\Graphic\IDrawer2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\GXEZ\Graphic\IImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -37,9 +34,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\GXEZ\Graphic\Sprite.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GXEZ\Graphic\SDL\Drawer2DSDL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\GXEZ\Graphic\SDL\WindowSDL.h">
@@ -93,15 +87,24 @@
     <ClInclude Include="include\GXEZ\Graphic\IRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\GXEZ\Graphic\SDL\RendererSDL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GXEZ\Graphic\SDL\ImageDrawer2DSDL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GXEZ\Graphic\IImageDrawer2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GXEZ\Graphic\IDrawer2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Event\IEvent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Event\IEventHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Graphic\SDL\Drawer2DSDL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Graphic\SDL\WindowSDL.cpp">
@@ -150,6 +153,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Tool\FPSComputer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphic\SDL\RendererSDL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphic\SDL\ImageDrawer2DSDL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -10,7 +10,7 @@
 #include "GXEZ/GXEZDefinitions.h"
 #include "GXEZ/Graphic/IWindow.h"
 #include "GXEZ/Graphic/SDL/ImageSDL.h"
-#include "GXEZ/Graphic/SDL/Drawer2DSDL.h"
+#include "GXEZ/Graphic/SDL/ImageDrawer2DSDL.h"
 
 #if GXEZ_SDL
 
@@ -65,17 +65,20 @@ namespace GXEZ
 		// Event Handler
 		virtual void				LinkEventHandler(IEventHandler* eventHandler) override;
 		// Drawer
-		virtual void				LinkDrawer2D(IDrawer2D* drawer) override;
-		virtual void				UseDrawer2D() override;
+		virtual void				LinkImageDrawer2D(IImageDrawer2D* drawer) override;
+		virtual void				UseImageDrawer2D() override;
+		virtual const ColorFormat&	GetColorFormat() const override;
 
-		// SDL - Only!
-		IImage* GetBackBuffer() const;
-		const ColorFormat& GetColorFormat() const;
+		// SDL - Only! And deprecated
+		ImageSDL*					GetSDLBackBuffer() const;
+		SDL_Window*					GetSDLWindow() const;
+		void						SetSDLRenderer(SDL_Renderer* renderer);
+		SDL_Renderer*				GetSDLRenderer() const;
 
 	protected:
 
 		// Init For Construction
-		void				InitBasics();
+		void				InitBasics(GXEZContextSDL* context);
 
 		// Event Handlers
 		void				EventResize();
@@ -101,7 +104,10 @@ namespace GXEZ
 		ImageSDL*		_buffer;
 
 		IEventHandler*	_linkedEventHandler;
-		Drawer2DSDL*	_drawer;
+
+		ImageDrawer2DSDL*	_drawer;
+
+		SDL_Renderer*	_renderer;
 
 		GXEZContextSDL* _context;
 	};

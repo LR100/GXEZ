@@ -9,7 +9,7 @@
 
 namespace GXEZ
 {
-	GUIItem::GUIItem(GUIManager* manager, GUIItem* parent, IDrawer2D* drawer, GUIItem::ItemType type, const GUIItem::Definition& definition)
+	GUIItem::GUIItem(GUIManager* manager, GUIItem* parent, IImageDrawer2D* drawer, GUIItem::ItemType type, const GUIItem::Definition& definition)
 	{
 		_id = 0;
 		_type = type;
@@ -35,14 +35,14 @@ namespace GXEZ
 		}
 	}
 
-	void GUIItem::Draw(IDrawer2D* drawer)
+	void GUIItem::Draw(IImageDrawer2D* drawer)
 	{
 		if (_isVisible) {
 			OnDraw(drawer);
 		}
 	}
 
-	void GUIItem::DrawTree(IDrawer2D* drawer)
+	void GUIItem::DrawTree(IImageDrawer2D* drawer)
 	{
 		// std::cout << "GUIItem::DrawTree()" << std::endl;
 		// Draw This
@@ -251,7 +251,7 @@ namespace GXEZ
 		_aabb.ComputeMinMax();
 	}
 
-	GUIButton::GUIButton(GUIManager* manager, GUIItem* parent, IDrawer2D* drawer, const GUIButton::Definition& definition) : GUIItem(manager, parent, drawer, GUIItem::ItemType::BUTTON, definition)
+	GUIButton::GUIButton(GUIManager* manager, GUIItem* parent, IImageDrawer2D* drawer, const GUIButton::Definition& definition) : GUIItem(manager, parent, drawer, GUIItem::ItemType::BUTTON, definition)
 	{
 		SetDefinitionButton(definition);
 		_onClickHandler = NULL;
@@ -288,7 +288,7 @@ namespace GXEZ
 
 		////// DRAW //////
 		// Button Borders
-		IDrawer2D::RectBorder rectBorder;
+		IImageDrawer2D::RectBorder rectBorder;
 
 		rectBorder.width = GetRealSizeWidth();
 		rectBorder.height = GetRealSizeHeight();
@@ -300,7 +300,7 @@ namespace GXEZ
 		_drawer->DrawRectBorder(0, 0, rectBorder);
 
 		// BackGround
-		IDrawer2D::Rect rect;
+		IImageDrawer2D::Rect rect;
 
 		rect.width = (GetRealSizeWidth() - (border.size * 2));
 		rect.height = (GetRealSizeHeight() - (border.size * 2));
@@ -311,26 +311,26 @@ namespace GXEZ
 
 		///// CIRCLE TEST /////
 
-		//IDrawer2D::Circle circle;
+		//IImageDrawer2D::Circle circle;
 
 		//circle.diameter = border.radius * 2;
 
 		//Vec2i pc(int(GetRealSizeWidth() / 2), int(GetRealSizeHeight() / 2));
 
 		//circle.color = Color::RED();
-		//circle.part = IDrawer2D::Circle::Part::TOP_LEFT;
+		//circle.part = IImageDrawer2D::Circle::Part::TOP_LEFT;
 		//_drawer->DrawCircle(pc.x, pc.y, circle);
 
 		//circle.color = Color::GREEN();
-		//circle.part = IDrawer2D::Circle::Part::TOP_RIGHT;
+		//circle.part = IImageDrawer2D::Circle::Part::TOP_RIGHT;
 		//_drawer->DrawCircle(pc.x, pc.y, circle);
 
 		//circle.color = Color::YELLOW();
-		//circle.part = IDrawer2D::Circle::Part::BOTTOM_LEFT;
+		//circle.part = IImageDrawer2D::Circle::Part::BOTTOM_LEFT;
 		//_drawer->DrawCircle(pc.x, pc.y, circle);
 
 		//circle.color = Color::BLUE();
-		//circle.part = IDrawer2D::Circle::Part::BOTTOM_RIGHT;
+		//circle.part = IImageDrawer2D::Circle::Part::BOTTOM_RIGHT;
 		//_drawer->DrawCircle(pc.x, pc.y, circle);
 
 		imageBuffer->Export("test");
@@ -358,7 +358,7 @@ namespace GXEZ
 		_sprites.push_back(CreateSpriteBase(_definitionButton.clicked.border, _definitionButton.clicked.background));
 	}
 
-	void GUIButton::OnDraw(IDrawer2D* drawer)
+	void GUIButton::OnDraw(IImageDrawer2D* drawer)
 	{
 		//std::cout << "GUIButton::Draw()" << std::endl;
 		if (IsClicked())
@@ -381,11 +381,11 @@ namespace GXEZ
 		CreateSprites();
 	}
 
-	GUICanvas::GUICanvas(GUIManager* manager, GUIItem* parent, IDrawer2D* drawer, const GUIItem::Definition& definition) : GUIItem(manager, parent, drawer, GUIItem::ItemType::BUTTON, definition)
+	GUICanvas::GUICanvas(GUIManager* manager, GUIItem* parent, IImageDrawer2D* drawer, const GUIItem::Definition& definition) : GUIItem(manager, parent, drawer, GUIItem::ItemType::BUTTON, definition)
 	{
 	}
 
-	void GUICanvas::OnDraw(IDrawer2D* drawer)
+	void GUICanvas::OnDraw(IImageDrawer2D* drawer)
 	{
 		// Do Nothing
 	}

@@ -1,26 +1,27 @@
 // GXEZ
-#include "GXEZ/Graphic/SDL/Drawer2DSDL.h"
+#include "GXEZ/Graphic/SDL/ImageDrawer2DSDL.h"
 #include "GXEZ/SDL/GXEZContextSDL.h"
 
 // STD
 #include <bitset>
 #include <iostream> // TMP
+#include "..\..\..\include\GXEZ\Graphic\SDL\ImageDrawer2DSDL.h"
 
 #if GXEZ_SDL
 
 namespace GXEZ
 {
 
-	Drawer2DSDL* Drawer2DSDL::sptr = NULL;    //initialize Singleton pointer to NULL
+	ImageDrawer2DSDL* ImageDrawer2DSDL::sptr = NULL;    //initialize Singleton pointer to NULL
 
-	Drawer2DSDL::Drawer2DSDL(GXEZContextSDL* context, const ColorFormat& format) : _dCBr(this), _dRB(this), _dR(this)
+	ImageDrawer2DSDL::ImageDrawer2DSDL(GXEZContextSDL* context, const ColorFormat& format) : _dCBr(this), _dRB(this), _dR(this)
 	{
 		_context = context;
 		_defaultImage = NULL;
 		std::cout << "DRAWER 2D ADDR (" << this << ")" << std::endl;
 		if (sptr != this)
 		{
-			std::cout << std::endl << "-Drawer2DSDL()-" << std::endl;
+			std::cout << std::endl << "-ImageDrawer2DSDL()-" << std::endl;
 			_spriteActive = NULL;
 			_spriteColorTransparency = new Color();
 			_currImage = NULL;
@@ -34,7 +35,7 @@ namespace GXEZ
 				std::cout << "SET DEF FORMAT" << std::endl;
 				_defaultImageFormat = format;
 			}
-			std::cout << "Drawer2DSDL : Default Image Format (" << ColorFormatToString(_defaultImageFormat) << ")" << std::endl;
+			std::cout << "ImageDrawer2DSDL : Default Image Format (" << ColorFormatToString(_defaultImageFormat) << ")" << std::endl;
 		}
 
 		uint32_t a;
@@ -59,28 +60,28 @@ namespace GXEZ
 		sptr = this;
 	}
 
-	Drawer2DSDL::~Drawer2DSDL()
+	ImageDrawer2DSDL::~ImageDrawer2DSDL()
 	{
 	}
 
-	void* Drawer2DSDL::operator new(size_t size)
+	void* ImageDrawer2DSDL::operator new(size_t size)
 	{
 		if (sptr != NULL)    //if already one object is created return reference to same object
 		{
-			std::cout << "1 + Nth Creation Drawer2DSDL" << std::endl;
+			std::cout << "1 + Nth Creation ImageDrawer2DSDL" << std::endl;
 			std::cout << "Return Drawer 2D Img Format(" << ColorFormatToString(sptr->_defaultImageFormat) << ")" << std::endl;
 			return (sptr);
 		}
 		else
 		{
-			std::cout << "FIRST Drawer2DSDL" << std::endl;
+			std::cout << "FIRST ImageDrawer2DSDL" << std::endl;
 
 			return (calloc(1, size));    //else allocate memory for one (first) object
 		}
 	}
 
 
-	void Drawer2DSDL::Quit()
+	void ImageDrawer2DSDL::Quit()
 	{
 		// Images
 		std::unordered_map<std::string, ImageSDL*>::iterator itImage = _images.begin();
@@ -107,15 +108,15 @@ namespace GXEZ
 		//Texture*										_textActiveure;
 	}
 
-	void Drawer2DSDL::SetDefaultFont(const std::string& name)
+	void ImageDrawer2DSDL::SetDefaultFont(const std::string& name)
 	{
 	}
 
-	void Drawer2DSDL::SetDefaultFontSize(const unsigned int& size)
+	void ImageDrawer2DSDL::SetDefaultFontSize(const unsigned int& size)
 	{
 	}
 
-	bool Drawer2DSDL::SetCurrentImage(IImage* image)
+	bool ImageDrawer2DSDL::SetCurrentImage(IImage* image)
 	{
 		if (image) {
 			if (image->GetFormat() == _defaultImageFormat)
@@ -125,7 +126,7 @@ namespace GXEZ
 			}
 			else
 			{
-				std::cerr << "Drawer2DSDL::SetCurrentImage() : Bad Image Format D(" << _defaultImageFormat << ") != I(" << image->GetFormat() << ")" << std::endl;
+				std::cerr << "ImageDrawer2DSDL::SetCurrentImage() : Bad Image Format D(" << _defaultImageFormat << ") != I(" << image->GetFormat() << ")" << std::endl;
 			}
 		}
 		else {
@@ -135,14 +136,14 @@ namespace GXEZ
 		return (false);
 	}
 
-	IImage* Drawer2DSDL::GetCurrentImage() const
+	IImage* ImageDrawer2DSDL::GetCurrentImage() const
 	{
 		return (_currImage);
 	}
 
-	void Drawer2DSDL::SetDefaultImage(const std::string& name)
+	void ImageDrawer2DSDL::SetDefaultImage(const std::string& name)
 	{
-		std::cerr << "Drawer2DSDL::SetDefaultImage() " << std::endl;
+		std::cerr << "ImageDrawer2DSDL::SetDefaultImage() " << std::endl;
 		if (_images.count(name))
 		{
 			_defaultImageName = name;
@@ -150,29 +151,29 @@ namespace GXEZ
 		}
 	}
 
-	const std::string& Drawer2DSDL::GetDefaultImageName()
+	const std::string& ImageDrawer2DSDL::GetDefaultImageName()
 	{
 		return (_defaultImageName);
 	}
 
-	void Drawer2DSDL::UseDefaultImage()
+	void ImageDrawer2DSDL::UseDefaultImage()
 	{
 		_currImage = _defaultImage;
 		_currImageName = _defaultImageName;
 	}
 
-	void Drawer2DSDL::SetDefaultFormatImage(const ColorFormat& format)
+	void ImageDrawer2DSDL::SetDefaultFormatImage(const ColorFormat& format)
 	{
 		std::cout << "SET DEFAULT FORMAT IMAGE (" << format << ")" << std::endl;
 		_defaultImageFormat = format;
 	}
 
-	const ColorFormat& Drawer2DSDL::GetDefaultFormatImage()
+	const ColorFormat& ImageDrawer2DSDL::GetDefaultFormatImage()
 	{
 		return (_defaultImageFormat);
 	}
 
-	IImage* Drawer2DSDL::CreateImage(const std::string& name, const unsigned int& w, const unsigned int& h, const ColorFormat& format)
+	IImage* ImageDrawer2DSDL::CreateImage(const std::string& name, const unsigned int& w, const unsigned int& h, const ColorFormat& format)
 	{
 		ImageSDL* img = new ImageSDL;
 
@@ -181,7 +182,7 @@ namespace GXEZ
 		return (img);
 	}
 
-	void Drawer2DSDL::UseImage(const std::string& name)
+	void ImageDrawer2DSDL::UseImage(const std::string& name)
 	{
 		if (_images.count(name))
 		{
@@ -190,14 +191,14 @@ namespace GXEZ
 		}
 	}
 
-	IImage* Drawer2DSDL::GetImage(const std::string& name)
+	IImage* ImageDrawer2DSDL::GetImage(const std::string& name)
 	{
 		if (_images.count(name))
 			return ((IImage*)(_images.at(name)));
 		return (NULL);
 	}
 
-	IImage* Drawer2DSDL::RemoveImage(const std::string& name)
+	IImage* ImageDrawer2DSDL::RemoveImage(const std::string& name)
 	{
 		IImage* img;
 
@@ -213,7 +214,7 @@ namespace GXEZ
 		return (img);
 	}
 
-	void Drawer2DSDL::ScaleImage(const unsigned int& sW, const unsigned int& sH)
+	void ImageDrawer2DSDL::ScaleImage(const unsigned int& sW, const unsigned int& sH)
 	{
 		if (!_currImage)
 			return;
@@ -230,14 +231,14 @@ namespace GXEZ
 
 	}
 
-	void Drawer2DSDL::ClearImage()
+	void ImageDrawer2DSDL::ClearImage()
 	{
 		if (!_currImage)
 			return;
 		_currImage->Clear();
 	}
 
-	void Drawer2DSDL::CopyImage(const std::string& nameToDraw)
+	void ImageDrawer2DSDL::CopyImage(const std::string& nameToDraw)
 	{
 		if (!_currImage || !_images.count(nameToDraw))
 			return;
@@ -246,7 +247,7 @@ namespace GXEZ
 		SDL_BlitScaled(img->GetSurface(), NULL, _currImage->GetSurface(), NULL);
 	}
 
-	void Drawer2DSDL::DrawImage(const std::string& nameToDraw, const int& xPos, const int& yPos)
+	void ImageDrawer2DSDL::DrawImage(const std::string& nameToDraw, const int& xPos, const int& yPos)
 	{
 		if (!_currImage || !_images.count(nameToDraw))
 			return;
@@ -258,7 +259,36 @@ namespace GXEZ
 		SDL_BlitSurface(img->GetSurface(), NULL, _currImage->GetSurface(), &rect);
 	}
 
-	void Drawer2DSDL::DrawPoint(const int& x, const int& y, const Color& color)
+	void ImageDrawer2DSDL::DrawPoint(const Vec2i& pos, const Color& color)
+	{
+		DrawPoint(pos.x, pos.y, color);
+	}
+
+	void ImageDrawer2DSDL::DrawLine(const Vec2i& a, const Vec2i& b, const Color& color)
+	{
+		DrawLine(a.x, a.y, b.x, b.y, color);
+	}
+
+	void ImageDrawer2DSDL::DrawRectBorder(const Vec2i& pos, const RectBorder& borderdef)
+	{
+		DrawRectBorder(pos.x, pos.y, borderdef);
+	}
+
+	void ImageDrawer2DSDL::DrawRect(const Vec2i& pos, const Rect& rect)
+	{
+		DrawRect(pos.x, pos.y, rect);
+	}
+
+	void ImageDrawer2DSDL::DrawCircle(const Vec2i& pos, const Circle& circle)
+	{
+	}
+
+	void ImageDrawer2DSDL::DrawText(const Vec2i& pos, const Text& text)
+	{
+		std::cerr << "ImageDrawer2DSDL::DrawText() NOT IMPLEMENTED" << std::endl;
+	}
+
+	void ImageDrawer2DSDL::DrawPoint(const int& x, const int& y, const Color& color)
 	{
 		if (x < 0 || y < 0)
 			return;
@@ -267,7 +297,7 @@ namespace GXEZ
 		InternSetPixel(x, y, color.value());
 	}
 
-	void Drawer2DSDL::DrawLine(const int& xB, const int& yB, const int& xE, const int& yE, const Color& color)
+	void ImageDrawer2DSDL::DrawLine(const int& xB, const int& yB, const int& xE, const int& yE, const Color& color)
 	{
 		if (!_currImage)
 			return;
@@ -329,7 +359,7 @@ namespace GXEZ
 		}
 	}
 
-	void Drawer2DSDL::DrawLine(const int& x, const int& y, const int& xE, const int& yE, const Color& colorB, const Color& colorE)
+	void ImageDrawer2DSDL::DrawLine(const int& x, const int& y, const int& xE, const int& yE, const Color& colorB, const Color& colorE)
 	{
 		if (!_currImage)
 			return;
@@ -413,7 +443,7 @@ namespace GXEZ
 	}
 
 
-	void Drawer2DSDL::DrawRectBorder(const int& x, const int& y, const RectBorder& border)
+	void ImageDrawer2DSDL::DrawRectBorder(const int& x, const int& y, const RectBorder& border)
 	{
 		// std::cout << "Draw Rect Border at (" << x << ") (" << y << ") Size (" << border.height << ") (" << border.width << ")" << std::endl;
 		if (!_currImage)
@@ -427,7 +457,7 @@ namespace GXEZ
 	///
 	// 
 
-	void Drawer2DSDL::DrawRect(const int& x, const int& y, const Rect& rect)
+	void ImageDrawer2DSDL::DrawRect(const int& x, const int& y, const Rect& rect)
 	{
 		// std::cout << "Draw Rect  at (" << x << ") (" << y << ") Size (" << rect.height << ") (" << rect.width << ")" << std::endl;
 		if (!_currImage)
@@ -436,7 +466,7 @@ namespace GXEZ
 	}
 
 
-	void Drawer2DSDL::DrawRectFill(const int& x, const int& y, const unsigned int& width, const unsigned int& height, float fillscale, const Color& color)
+	void ImageDrawer2DSDL::DrawRectFill(const int& x, const int& y, const unsigned int& width, const unsigned int& height, float fillscale, const Color& color)
 	{
 		if (!_currImage)
 			return;
@@ -514,7 +544,7 @@ namespace GXEZ
 		//}
 	}
 
-	void Drawer2DSDL::DrawCircleFill(const int& x, const int& y, const unsigned int& diameter, const Color& color)
+	void ImageDrawer2DSDL::DrawCircleFill(const int& x, const int& y, const unsigned int& diameter, const Color& color)
 	{
 		if (!_currImage)
 			return;
@@ -561,7 +591,7 @@ namespace GXEZ
 		}
 	}
 
-	void Drawer2DSDL::DrawCircleFill(const int& x, const int& y, const unsigned int& diameter, const Color& colora, const Color& colorb)
+	void ImageDrawer2DSDL::DrawCircleFill(const int& x, const int& y, const unsigned int& diameter, const Color& colora, const Color& colorb)
 	{
 		if (!_currImage)
 			return;
@@ -603,7 +633,7 @@ namespace GXEZ
 				}
 	}
 
-	void Drawer2DSDL::DrawCircle(const int& x, const int& y, const unsigned int& diameter, const Color& color)
+	void ImageDrawer2DSDL::DrawCircle(const int& x, const int& y, const unsigned int& diameter, const Color& color)
 	{
 		if (!_currImage)
 			return;
@@ -662,14 +692,14 @@ namespace GXEZ
 		}
 	}
 
-	void Drawer2DSDL::DrawCircle(const int& x, const int& y, const Circle& circle)
+	void ImageDrawer2DSDL::DrawCircle(const int& x, const int& y, const Circle& circle)
 	{
 		if (!_currImage)
 			return;
 		_dCBr.Draw(x, y, circle);
 	}
 
-	//void Drawer2DSDL::DrawPolygon(const unsigned int & xPos, const unsigned int & yPos, const std::vector<Vec2>& points, const Color & color)
+	//void ImageDrawer2DSDL::DrawPolygon(const unsigned int & xPos, const unsigned int & yPos, const std::vector<Vec2>& points, const Color & color)
 	//{
 	//	if (!_currImage)
 	//		return;
@@ -679,7 +709,7 @@ namespace GXEZ
 	//	//DrawEdges(edges, xPos, yPos, color);
 	//}
 
-	int Drawer2DSDL::LoadText(const std::string& text, const unsigned int& sFont, const std::string& font, const Color& color)
+	int ImageDrawer2DSDL::LoadText(const std::string& text, const unsigned int& sFont, const std::string& font, const Color& color)
 	{
 		if (!_currImage)
 			return (-1);
@@ -691,7 +721,7 @@ namespace GXEZ
 		{
 			if (!(tfont = TTF_OpenFont(font.c_str(), sFont)))
 			{
-				std::cerr << "IDrawer2D: Cannot Opent Font: (" << font << ") of size: (" << sFont << ")\n";
+				std::cerr << "IImageDrawer2D: Cannot Opent Font: (" << font << ") of size: (" << sFont << ")\n";
 				return (-1);
 			}
 			_fonts[ss.str()].font = tfont;
@@ -706,13 +736,13 @@ namespace GXEZ
 		}
 		if (!(_textActive.text = TTF_RenderText_Blended(tfont, text.c_str(), tmp_color)))
 		{
-			std::cerr << "IDrawer2D: Cannot Render Font: (" << font << ") (" << SDL_GetError() << ")\n";
+			std::cerr << "IImageDrawer2D: Cannot Render Font: (" << font << ") (" << SDL_GetError() << ")\n";
 			return (-1);
 		}
 		return (0);
 	}
 
-	void Drawer2DSDL::GetSizeText(unsigned int& w, unsigned int& h)
+	void ImageDrawer2DSDL::GetSizeText(unsigned int& w, unsigned int& h)
 	{
 		if (!_textActive.text)
 		{
@@ -726,7 +756,7 @@ namespace GXEZ
 		}
 	}
 
-	void Drawer2DSDL::DrawText(const int& xPos, const int& yPos)
+	void ImageDrawer2DSDL::DrawText(const int& xPos, const int& yPos)
 	{
 		if (!_currImage || !_textActive.text)
 			return;
@@ -739,7 +769,7 @@ namespace GXEZ
 		SDL_SetColorKey(_textActive.text, SDL_FALSE, SDL_MapRGB(_textActive.text->format, GXEZ_DRAWER2DSDL_TRSPR, GXEZ_DRAWER2DSDL_TRSPG, GXEZ_DRAWER2DSDL_TRSPB));
 	}
 
-	bool CmpYMinPolyEdge(const Drawer2DSDL::PolyEdge* pA, const Drawer2DSDL::PolyEdge* pB)
+	bool CmpYMinPolyEdge(const ImageDrawer2DSDL::PolyEdge* pA, const ImageDrawer2DSDL::PolyEdge* pB)
 	{
 		if (pA->min_y < pB->min_y)
 			return (true);
@@ -751,21 +781,21 @@ namespace GXEZ
 	///////////////////////
 	/*
 
-	bool CmpYMaxPolyEdge(const Drawer2DSDL::PolyEdge* pA, const Drawer2DSDL::PolyEdge* pB)
+	bool CmpYMaxPolyEdge(const ImageDrawer2DSDL::PolyEdge* pA, const ImageDrawer2DSDL::PolyEdge* pB)
 	{
 	if (pA->max_y < pB->max_y)
 	return (true);
 	return (false);
 	}
 
-	bool CmpXPolyEdge(const Drawer2DSDL::PolyEdge* pA, const Drawer2DSDL::PolyEdge* pB)
+	bool CmpXPolyEdge(const ImageDrawer2DSDL::PolyEdge* pA, const ImageDrawer2DSDL::PolyEdge* pB)
 	{
 	if (pA->x_to_min_y < pB->x_to_min_y)
 	return (true);
 	return (false);
 	}
 
-	void Drawer2DSDL::DrawPolygon(const unsigned int & xPos, const unsigned int & yPos, const std::vector<Vec2>& points, const Color & color)
+	void ImageDrawer2DSDL::DrawPolygon(const unsigned int & xPos, const unsigned int & yPos, const std::vector<Vec2>& points, const Color & color)
 	{
 	if (!_currImage)
 	return;
@@ -809,7 +839,7 @@ namespace GXEZ
 	}
 
 
-	void Drawer2DSDL::CreateEdges(const std::vector<Vec2>& points, std::vector<PolyEdge>& edges)
+	void ImageDrawer2DSDL::CreateEdges(const std::vector<Vec2>& points, std::vector<PolyEdge>& edges)
 	{
 	PolyEdge				edge;
 	float					tmp;
@@ -852,7 +882,7 @@ namespace GXEZ
 	edges.push_back(edge);
 	}
 
-	void Drawer2DSDL::CreateSortedEdges(std::vector<PolyEdge>& edges, std::vector<std::vector<PolyEdge*>>& sorted_edges)
+	void ImageDrawer2DSDL::CreateSortedEdges(std::vector<PolyEdge>& edges, std::vector<std::vector<PolyEdge*>>& sorted_edges)
 	{
 	std::vector<PolyEdge*>	empty;
 	int						yInc;
@@ -881,7 +911,7 @@ namespace GXEZ
 	}
 	}
 
-	void Drawer2DSDL::UpdateXEdges(std::vector<PolyEdge*> edges)
+	void ImageDrawer2DSDL::UpdateXEdges(std::vector<PolyEdge*> edges)
 	{
 	for (unsigned int inc = 0; inc < edges.size(); inc++)
 	edges.at(inc)->x_to_min_y += edges.at(inc)->slope;
@@ -890,14 +920,14 @@ namespace GXEZ
 
 	*/
 
-	void Drawer2DSDL::AddSprite(const std::string& id, Sprite* sprite)
+	void ImageDrawer2DSDL::AddSprite(const std::string& id, Sprite* sprite)
 	{
 		if (_sprites.count(id))
 			return;
 		_sprites.emplace(id, sprite);
 	}
 
-	void Drawer2DSDL::LoadSprite(const std::string& id, const std::string& path)
+	void ImageDrawer2DSDL::LoadSprite(const std::string& id, const std::string& path)
 	{
 		if (_sprites.count(id) || !_currImage)
 			return;
@@ -920,19 +950,19 @@ namespace GXEZ
 		}
 	}
 
-	void Drawer2DSDL::SetSprite(const std::string& id)
+	void ImageDrawer2DSDL::SetSprite(const std::string& id)
 	{
 		if (!_sprites.count(id))
 			return;
 		_spriteActive = _sprites.at(id);
 	}
 
-	void Drawer2DSDL::SetSpriteColorTransparency(const Color& color)
+	void ImageDrawer2DSDL::SetSpriteColorTransparency(const Color& color)
 	{
 		_spriteColorTransparency = new Color(color);
 	}
 
-	void Drawer2DSDL::DrawSprite(const int& x, const int& y)
+	void ImageDrawer2DSDL::DrawSprite(const int& x, const int& y)
 	{
 		if (!_spriteActive || !_currImage)
 			return;
@@ -959,7 +989,7 @@ namespace GXEZ
 		}
 	}
 
-	void Drawer2DSDL::DrawSprite(const int& x, const int& y, Sprite* sprite)
+	void ImageDrawer2DSDL::DrawSprite(const int& x, const int& y, Sprite* sprite)
 	{
 		if (!sprite || !_currImage)
 			return;
@@ -978,20 +1008,20 @@ namespace GXEZ
 		}
 	}
 
-	void Drawer2DSDL::AddImage(const std::string& name, ImageSDL* img)
+	void ImageDrawer2DSDL::AddImage(const std::string& name, ImageSDL* img)
 	{
 		_images[name] = img;
 		UseImage(name);
 	}
 
 
-	inline void Drawer2DSDL::CorrectXY(int& x, int& y)
+	inline void ImageDrawer2DSDL::CorrectXY(int& x, int& y)
 	{
 		x = CorrectX(x);
 		y = CorrectY(y);
 	}
 
-	inline int Drawer2DSDL::CorrectX(const int& x)
+	inline int ImageDrawer2DSDL::CorrectX(const int& x)
 	{
 		if (x < 0)
 			return (0);
@@ -1000,7 +1030,7 @@ namespace GXEZ
 		return (x);
 	}
 
-	inline int Drawer2DSDL::CorrectY(const int& y)
+	inline int ImageDrawer2DSDL::CorrectY(const int& y)
 	{
 		if (y < 0)
 			return (0);
@@ -1009,13 +1039,13 @@ namespace GXEZ
 		return (y);
 	}
 
-	inline void Drawer2DSDL::InternSetPixel(const int& x, const int& y, const unsigned int& color)
+	inline void ImageDrawer2DSDL::InternSetPixel(const int& x, const int& y, const unsigned int& color)
 	{
 		//std::cout << "Curr Image Format : (" << ColorFormatToString(_currImage->GetFormat()) << ")" << std::endl;
 		_currImage->SetPixel((unsigned int)x, (unsigned int)y, color);
 	}
 
-	inline void Drawer2DSDL::InternCheckBFSetPixel(const int& x, const int& y, const unsigned int& color)
+	inline void ImageDrawer2DSDL::InternCheckBFSetPixel(const int& x, const int& y, const unsigned int& color)
 	{
 		if (x < 0 || y < 0)
 			return;
@@ -1024,7 +1054,7 @@ namespace GXEZ
 		_currImage->SetPixel(x, y, color);
 	}
 
-	inline void Drawer2DSDL::InternSetLine(const int& x, const int& y, const int& xe, const Sprite::Line& line)
+	inline void ImageDrawer2DSDL::InternSetLine(const int& x, const int& y, const int& xe, const Sprite::Line& line)
 	{
 		if (y < 0)
 			return;
@@ -1043,11 +1073,11 @@ namespace GXEZ
 		}
 	}
 
-	void Drawer2DSDL::Init()
+	void ImageDrawer2DSDL::Init()
 	{
 	}
 
-	void Drawer2DSDL::DrawRectSnakeAttrib::IncDrawRectangle(char& dir, unsigned int& filledRect, unsigned int& x, unsigned int& y, unsigned int& minX, unsigned int& minY, unsigned int& maxX, unsigned int& maxY)
+	void ImageDrawer2DSDL::DrawRectSnakeAttrib::IncDrawRectangle(char& dir, unsigned int& filledRect, unsigned int& x, unsigned int& y, unsigned int& minX, unsigned int& minY, unsigned int& maxX, unsigned int& maxY)
 	{
 		if (dir == 0) // DOWN
 		{
@@ -1088,7 +1118,7 @@ namespace GXEZ
 		}
 	}
 
-	void Drawer2DSDL::DrawRectSnakeAttrib::Init(unsigned int width, unsigned int height, unsigned int xPos, unsigned int yPos, float fillScale)
+	void ImageDrawer2DSDL::DrawRectSnakeAttrib::Init(unsigned int width, unsigned int height, unsigned int xPos, unsigned int yPos, float fillScale)
 	{
 		minX = xPos;
 		minY = yPos;
@@ -1110,7 +1140,7 @@ namespace GXEZ
 	/////                  ///////
 	//////////////////////////////
 
-	Drawer2DSDL::DrawerCircleBressenham::DrawerCircleBressenham(Drawer2DSDL* drawer)
+	ImageDrawer2DSDL::DrawerCircleBressenham::DrawerCircleBressenham(ImageDrawer2DSDL* drawer)
 	{
 		_drawFct = NULL;
 		_drawer = drawer;
@@ -1121,13 +1151,13 @@ namespace GXEZ
 		d = 0;
 	}
 
-	void Drawer2DSDL::DrawerCircleBressenham::Draw(const int& _x, const int& _y, const Circle& circle)
+	void ImageDrawer2DSDL::DrawerCircleBressenham::Draw(const int& _x, const int& _y, const Circle& circle)
 	{
 		SetPartsPosition(Vec2i(_x, _y), Circle::Part::FULL);
 		Draw(circle);
 	}
 
-	void Drawer2DSDL::DrawerCircleBressenham::Draw(const Circle& circle)
+	void ImageDrawer2DSDL::DrawerCircleBressenham::Draw(const Circle& circle)
 	{
 		_circle = circle;
 		for (t = 0; t < _circle.thickness; t += 1)
@@ -1136,26 +1166,26 @@ namespace GXEZ
 			x = 0;
 			y = r;
 			d = 3 - 2 * r;
-			if (circle.part == IDrawer2D::Circle::Part::FULL) {
-				_drawFct = &Drawer2DSDL::DrawerCircleBressenham::DrawFull;
+			if (circle.part == IImageDrawer2D::Circle::Part::FULL) {
+				_drawFct = &ImageDrawer2DSDL::DrawerCircleBressenham::DrawFull;
 			}
-			else if (circle.part == IDrawer2D::Circle::Part::TOP) {
-				_drawFct = &Drawer2DSDL::DrawerCircleBressenham::DrawTop;
+			else if (circle.part == IImageDrawer2D::Circle::Part::TOP) {
+				_drawFct = &ImageDrawer2DSDL::DrawerCircleBressenham::DrawTop;
 			}
-			else if (circle.part == IDrawer2D::Circle::Part::TOP_LEFT) {
-				_drawFct = &Drawer2DSDL::DrawerCircleBressenham::DrawTopLeft;
+			else if (circle.part == IImageDrawer2D::Circle::Part::TOP_LEFT) {
+				_drawFct = &ImageDrawer2DSDL::DrawerCircleBressenham::DrawTopLeft;
 			}
-			else if (circle.part == IDrawer2D::Circle::Part::TOP_RIGHT) {
-				_drawFct = &Drawer2DSDL::DrawerCircleBressenham::DrawTopRight;
+			else if (circle.part == IImageDrawer2D::Circle::Part::TOP_RIGHT) {
+				_drawFct = &ImageDrawer2DSDL::DrawerCircleBressenham::DrawTopRight;
 			}
-			else if (circle.part == IDrawer2D::Circle::Part::BOTTOM) {
-				_drawFct = &Drawer2DSDL::DrawerCircleBressenham::DrawBottom;
+			else if (circle.part == IImageDrawer2D::Circle::Part::BOTTOM) {
+				_drawFct = &ImageDrawer2DSDL::DrawerCircleBressenham::DrawBottom;
 			}
-			else if (circle.part == IDrawer2D::Circle::Part::BOTTOM_LEFT) {
-				_drawFct = &Drawer2DSDL::DrawerCircleBressenham::DrawBottomLeft;
+			else if (circle.part == IImageDrawer2D::Circle::Part::BOTTOM_LEFT) {
+				_drawFct = &ImageDrawer2DSDL::DrawerCircleBressenham::DrawBottomLeft;
 			}
-			else if (circle.part == IDrawer2D::Circle::Part::BOTTOM_RIGHT) {
-				_drawFct = &Drawer2DSDL::DrawerCircleBressenham::DrawBottomRight;
+			else if (circle.part == IImageDrawer2D::Circle::Part::BOTTOM_RIGHT) {
+				_drawFct = &ImageDrawer2DSDL::DrawerCircleBressenham::DrawBottomRight;
 			}
 			if (_drawFct) {
 				// Start To Draw
@@ -1185,7 +1215,7 @@ namespace GXEZ
 		}
 	}
 
-	void Drawer2DSDL::DrawerCircleBressenham::SetPartsPosition(const Vec2i& pos, const Circle::Part& part)
+	void ImageDrawer2DSDL::DrawerCircleBressenham::SetPartsPosition(const Vec2i& pos, const Circle::Part& part)
 	{
 		if (part == Circle::Part::FULL) {
 			pBL = pos;
@@ -1215,43 +1245,43 @@ namespace GXEZ
 		}
 	}
 
-	void Drawer2DSDL::DrawerCircleBressenham::DrawFull()
+	void ImageDrawer2DSDL::DrawerCircleBressenham::DrawFull()
 	{
 		DrawTop();
 		DrawBottom();
 	}
 
-	void Drawer2DSDL::DrawerCircleBressenham::DrawTop()
+	void ImageDrawer2DSDL::DrawerCircleBressenham::DrawTop()
 	{
 		DrawTopLeft();
 		DrawTopRight();
 	}
 
-	void Drawer2DSDL::DrawerCircleBressenham::DrawTopLeft()
+	void ImageDrawer2DSDL::DrawerCircleBressenham::DrawTopLeft()
 	{
 		_drawer->InternCheckBFSetPixel(pTL.x - y, pTL.y - x, _circle.color.value());
 		_drawer->InternCheckBFSetPixel(pTL.x - x, pTL.y - y, _circle.color.value());
 	}
 
-	void Drawer2DSDL::DrawerCircleBressenham::DrawTopRight()
+	void ImageDrawer2DSDL::DrawerCircleBressenham::DrawTopRight()
 	{
 		_drawer->InternCheckBFSetPixel(pTR.x + x, pTR.y - y, _circle.color.value());
 		_drawer->InternCheckBFSetPixel(pTR.x + y, pTR.y - x, _circle.color.value());
 	}
 
-	void Drawer2DSDL::DrawerCircleBressenham::DrawBottom()
+	void ImageDrawer2DSDL::DrawerCircleBressenham::DrawBottom()
 	{
 		DrawBottomLeft();
 		DrawBottomRight();
 	}
 
-	void Drawer2DSDL::DrawerCircleBressenham::DrawBottomLeft()
+	void ImageDrawer2DSDL::DrawerCircleBressenham::DrawBottomLeft()
 	{
 		_drawer->InternCheckBFSetPixel(pBL.x - x, pBL.y + y, _circle.color.value());
 		_drawer->InternCheckBFSetPixel(pBL.x - y, pBL.y + x, _circle.color.value());
 	}
 
-	void Drawer2DSDL::DrawerCircleBressenham::DrawBottomRight()
+	void ImageDrawer2DSDL::DrawerCircleBressenham::DrawBottomRight()
 	{
 		_drawer->InternCheckBFSetPixel(pBR.x + y, pBR.y + x, _circle.color.value());
 		_drawer->InternCheckBFSetPixel(pBR.x + x, pBR.y + y, _circle.color.value());
@@ -1263,12 +1293,12 @@ namespace GXEZ
 	/////                  ///////
 	//////////////////////////////
 
-	Drawer2DSDL::IDrawerRect::IDrawerRect(Drawer2DSDL* drawer)
+	ImageDrawer2DSDL::IDrawerRect::IDrawerRect(ImageDrawer2DSDL* drawer)
 	{
 		_drawer = drawer;
 	}
 
-	void Drawer2DSDL::IDrawerRect::DrawStart(const int& _x, const int& _y, Rect& rect)
+	void ImageDrawer2DSDL::IDrawerRect::DrawStart(const int& _x, const int& _y, Rect& rect)
 	{
 		DrawInit(_x, _y, rect);
 		// Use corresponding method to type of rect)
@@ -1281,7 +1311,7 @@ namespace GXEZ
 	}
 
 	// Can Modify rect
-	bool Drawer2DSDL::IDrawerRect::DrawInit(const int& _x, const int& _y, Rect& rect)
+	bool ImageDrawer2DSDL::IDrawerRect::DrawInit(const int& _x, const int& _y, Rect& rect)
 	{
 		xr = _x;
 		yr = _y;
@@ -1299,13 +1329,13 @@ namespace GXEZ
 	}
 
 
-	void Drawer2DSDL::DrawerRect::Draw(const int& _x, const int& _y, const Rect& rect)
+	void ImageDrawer2DSDL::DrawerRect::Draw(const int& _x, const int& _y, const Rect& rect)
 	{
 		_rect = rect;
 		DrawStart(_x, _y, _rect);
 	}
 
-	void Drawer2DSDL::DrawerRect::DrawClassic()
+	void ImageDrawer2DSDL::DrawerRect::DrawClassic()
 	{
 		//std::cout << "DrawerRect::DrawClassic()" << std::endl;
 		for (_iR.xi = _iR.cX; _iR.xi < _iR.cXMax; _iR.xi++)
@@ -1314,7 +1344,7 @@ namespace GXEZ
 			}
 	}
 
-	void Drawer2DSDL::DrawerRect::DrawRadius()
+	void ImageDrawer2DSDL::DrawerRect::DrawRadius()
 	{
 		//std::cout << "DrawerRect::DrawRadius()" << std::endl;
 		float diameter = (float)_rect.radius * 2.0f;
@@ -1341,13 +1371,13 @@ namespace GXEZ
 		}
 	}
 
-	void Drawer2DSDL::DrawerRectBorder::Draw(const int& _x, const int& _y, const RectBorder& rectBorder)
+	void ImageDrawer2DSDL::DrawerRectBorder::Draw(const int& _x, const int& _y, const RectBorder& rectBorder)
 	{
 		_rectBorder = rectBorder;
 		DrawStart(_x, _y, _rectBorder);
 	}
 
-	void Drawer2DSDL::DrawerRectBorder::DrawClassic()
+	void ImageDrawer2DSDL::DrawerRectBorder::DrawClassic()
 	{
 		//std::cout << "DrawerRectBorder::DrawClassic()" << std::endl;
 		if (yr >= 0)
@@ -1370,7 +1400,7 @@ namespace GXEZ
 				_drawer->InternCheckBFSetPixel(_iR.xMax, _iR.yi, _rectBorder.color.value());
 	}
 
-	void Drawer2DSDL::DrawerRectBorder::DrawRadius()
+	void ImageDrawer2DSDL::DrawerRectBorder::DrawRadius()
 	{
 		//std::cout << "DrawerRectBorder::DrawRadius()" << std::endl;
 		int iradius = (int)_rectBorder.radius;
@@ -1417,32 +1447,32 @@ namespace GXEZ
 
 		borderCircle.diameter = (_rectBorder.radius * 2);
 		borderCircle.color = _rectBorder.color;
-		borderCircle.part = IDrawer2D::Circle::Part::FULL;
+		borderCircle.part = IImageDrawer2D::Circle::Part::FULL;
 
-		drawerBorderCircle.SetPartsPosition(Vec2i(xr + iradius, yr + iradius), IDrawer2D::Circle::Part::TOP_LEFT);
-		drawerBorderCircle.SetPartsPosition(Vec2i(xr - iradius + (int)_rectBorder.width - 1, yr + iradius), IDrawer2D::Circle::Part::TOP_RIGHT);
-		drawerBorderCircle.SetPartsPosition(Vec2i(xr + iradius, yr - iradius + (int)_rectBorder.height - 1), IDrawer2D::Circle::Part::BOTTOM_LEFT);
-		drawerBorderCircle.SetPartsPosition(Vec2i(xr - iradius + (int)_rectBorder.width - 1, yr - iradius + (int)_rectBorder.height - 1), IDrawer2D::Circle::Part::BOTTOM_RIGHT);
+		drawerBorderCircle.SetPartsPosition(Vec2i(xr + iradius, yr + iradius), IImageDrawer2D::Circle::Part::TOP_LEFT);
+		drawerBorderCircle.SetPartsPosition(Vec2i(xr - iradius + (int)_rectBorder.width - 1, yr + iradius), IImageDrawer2D::Circle::Part::TOP_RIGHT);
+		drawerBorderCircle.SetPartsPosition(Vec2i(xr + iradius, yr - iradius + (int)_rectBorder.height - 1), IImageDrawer2D::Circle::Part::BOTTOM_LEFT);
+		drawerBorderCircle.SetPartsPosition(Vec2i(xr - iradius + (int)_rectBorder.width - 1, yr - iradius + (int)_rectBorder.height - 1), IImageDrawer2D::Circle::Part::BOTTOM_RIGHT);
 
 		// DEBUG COLORS
 		/*borderCircle.color = Color::RED();
-		borderCircle.part = IDrawer2D::Circle::Part::TOP_LEFT;
+		borderCircle.part = IImageDrawer2D::Circle::Part::TOP_LEFT;
 		drawerBorderCircle.Draw(borderCircle);
 		borderCircle.color = Color::GREEN();
-		borderCircle.part = IDrawer2D::Circle::Part::TOP_RIGHT;
+		borderCircle.part = IImageDrawer2D::Circle::Part::TOP_RIGHT;
 		drawerBorderCircle.Draw(borderCircle);
 		borderCircle.color = Color::YELLOW();
-		borderCircle.part = IDrawer2D::Circle::Part::BOTTOM_LEFT;
+		borderCircle.part = IImageDrawer2D::Circle::Part::BOTTOM_LEFT;
 		drawerBorderCircle.Draw(borderCircle);
 		borderCircle.color = Color::BLUE();
-		borderCircle.part = IDrawer2D::Circle::Part::BOTTOM_RIGHT;
+		borderCircle.part = IImageDrawer2D::Circle::Part::BOTTOM_RIGHT;
 		drawerBorderCircle.Draw(borderCircle);*/
 
 		drawerBorderCircle.Draw(borderCircle);
 	}
 
 
-	bool Drawer2DSDL::InfoRect::Init(const int& xr, const int& yr, const unsigned int& widthMax, const unsigned int& heightMax, const unsigned int& width, const unsigned int& height)
+	bool ImageDrawer2DSDL::InfoRect::Init(const int& xr, const int& yr, const unsigned int& widthMax, const unsigned int& heightMax, const unsigned int& width, const unsigned int& height)
 	{
 		iw = (int)widthMax;
 		ih = (int)heightMax;
@@ -1467,7 +1497,7 @@ namespace GXEZ
 		return (true);
 	}
 
-	void Drawer2DSDL::InfoCircleBressenham::Init(const float& diameter)
+	void ImageDrawer2DSDL::InfoCircleBressenham::Init(const float& diameter)
 	{
 		r = int(diameter / 2.0f);
 		x = 0;

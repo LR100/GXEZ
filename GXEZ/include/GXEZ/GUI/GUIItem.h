@@ -129,11 +129,11 @@ namespace GXEZ
 			Background	background;
 		};
 
-		GUIItem(GUIManager* manager, GUIItem* parent, IDrawer2D* drawer, ItemType type, const GUIItem::Definition& definition);
+		GUIItem(GUIManager* manager, GUIItem* parent, IImageDrawer2D* drawer, ItemType type, const GUIItem::Definition& definition);
 
 		// Draw Sprites Into The Drawer
-		void				Draw(IDrawer2D* drawer);
-		void				DrawTree(IDrawer2D* drawer);
+		void				Draw(IImageDrawer2D* drawer);
+		void				DrawTree(IImageDrawer2D* drawer);
 
 		const unsigned int& GetID() const;
 		const ItemType& GetType() const;
@@ -170,7 +170,7 @@ namespace GXEZ
 		void				SetDefinition(const GUIItem::Definition& definition);
 
 		// OVERRIDABLE //
-		virtual void		OnDraw(IDrawer2D* drawer) = 0;
+		virtual void		OnDraw(IImageDrawer2D* drawer) = 0;
 		virtual void		OnClick(bool state) {};
 		virtual void		OnHovered(bool state) {};
 		virtual void		OnVisible(bool state) {};
@@ -187,7 +187,7 @@ namespace GXEZ
 		// Drawing/Design
 		GUIItem::Definition		_definition;
 		std::vector<Sprite*>	_sprites;
-		IDrawer2D* _drawer;
+		IImageDrawer2D* _drawer;
 
 
 
@@ -275,7 +275,7 @@ namespace GXEZ
 
 		// Draw
 		virtual void	CreateSprites() override;
-		Sprite* CreateSpriteBase(const GUIItem::Definition::Border& border, const GUIItem::Definition::Background& background);
+		Sprite*			CreateSpriteBase(const GUIItem::Definition::Border& border, const GUIItem::Definition::Background& background);
 		void			CreateSpriteNormal();
 		void			CreateSpriteHovered();
 		void			CreateSpriteClicked();
@@ -310,14 +310,14 @@ namespace GXEZ
 	//
 	//	GUIImage(GUIManager* manager, const Definition& definition);
 	//
-	//	virtual void	Draw(IDrawer2D* drawer) override;
+	//	virtual void	Draw(IImageDrawer2D* drawer) override;
 	//	void			SetDefinition(const GUIImage::Definition& definition);
 	//	void			SetDefinitionHovered(const GUIImage::Definition& definition);
 	//	void			SetHovered(bool hovered);
 	//
 	//private:
 	//
-	//	virtual void	CreateSprites(IDrawer2D* drawer) override;
+	//	virtual void	CreateSprites(IImageDrawer2D* drawer) override;
 	//
 	//	GUIImage::Definition		_definition;
 	//	GUIImage::Definition		_definitionHovered;

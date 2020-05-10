@@ -11,7 +11,7 @@
 // GXEZ
 #include "GXEZ/GXEZDefinitions.h"
 #include "GXEZ/Graphic/SDL/ImageSDL.h"
-#include "GXEZ/Graphic/IDrawer2D.h"
+#include "GXEZ/Graphic/IImageDrawer2D.h"
 
 // MXEZ
 #include "MXEZ/Value/ValueTools.h"
@@ -37,10 +37,10 @@ namespace GXEZ
 #define GXEZ_DRAWER2DSDL_TRSPG 24
 #define GXEZ_DRAWER2DSDL_TRSPB 244
 
-	class Drawer2DSDL : public IDrawer2D
+	class ImageDrawer2DSDL : public IImageDrawer2D
 	{
 	public:
-		Drawer2DSDL(GXEZContextSDL* context, const ColorFormat& format);
+		ImageDrawer2DSDL(GXEZContextSDL* context, const ColorFormat& format);
 
 
 		// SINGLETON BY CREATING
@@ -48,11 +48,11 @@ namespace GXEZ
 
 	private:
 
-		Drawer2DSDL(const Drawer2DSDL& other);
-		Drawer2DSDL(const Drawer2DSDL&& other);
+		ImageDrawer2DSDL(const ImageDrawer2DSDL& other);
+		ImageDrawer2DSDL(const ImageDrawer2DSDL&& other);
 
-		virtual ~Drawer2DSDL();
-		static Drawer2DSDL* sptr; // SINGLETON INSTANCE	
+		virtual ~ImageDrawer2DSDL();
+		static ImageDrawer2DSDL* sptr; // SINGLETON INSTANCE	
 
 	public:
 
@@ -83,7 +83,27 @@ namespace GXEZ
 		virtual void					CopyImage(const std::string& nameToDraw) override;
 		virtual void					DrawImage(const std::string& nameToDraw, const int& xPos, const int& yPos) override;
 
-		// Shapes
+		/////////////
+		// Shapes ///
+		/////////////
+
+		//////////////////// IDRAWER 2D ////////////////////
+		/// NEW METHODS 
+
+		// Point
+		virtual void					DrawPoint(const Vec2i& pos, const Color& color)  override;
+		// Line
+		virtual void					DrawLine(const Vec2i& a, const Vec2i& b, const Color& color)  override;
+		// Rect
+		virtual void					DrawRectBorder(const Vec2i& pos, const RectBorder& borderdef)  override;
+		virtual void					DrawRect(const Vec2i& pos, const Rect& rect) override;
+		// Circle
+		virtual void					DrawCircle(const Vec2i& pos, const Circle& circle)  override;
+		// Text
+		virtual void					DrawText(const Vec2i& pos, const Text& text) override;
+
+
+		/// EXTANDED - OLD - DEPRECATED
 		virtual void					DrawPoint(const int& x, const int& y, const Color& color) override;
 		virtual void					DrawLine(const int& x, const int& y, const int& xE, const int& yE, const Color& color) override;
 		virtual void					DrawLine(const int& x, const int& y, const int& xE, const int& yE, const Color& colorB, const Color& colorE) override;
@@ -92,12 +112,14 @@ namespace GXEZ
 		virtual void					DrawRect(const int& x, const int& y, const Rect& rect) override;
 		virtual void					DrawRectFill(const int& x, const int& y, const unsigned int& width, const unsigned int& height, float fillscale, const Color& color) override;
 
+
 		virtual void					DrawCircleFill(const int& x, const int& y, const unsigned int& diameter, const Color& color) override;
 		virtual void					DrawCircleFill(const int& x, const int& y, const unsigned int& diameter, const Color& colora, const Color& colorb) override;
 		virtual void					DrawCircle(const int& x, const int& y, const unsigned int& diameter, const Color& color) override;
 		virtual void					DrawCircle(const int& x, const int& y, const Circle& circle) override;
 
 		// Text Part
+
 		virtual int						LoadText(const std::string& text, const unsigned int& sFont, const std::string& font, const Color& color) override;
 		virtual void					GetSizeText(unsigned int& w, unsigned int& h) override;
 		virtual void					DrawText(const int& xPos, const int& yPos) override;
@@ -162,7 +184,7 @@ namespace GXEZ
 			TTF_Font* font;
 		};
 
-		struct Text
+		struct TextSDL
 		{
 			SDL_Surface* text;
 		};
@@ -179,7 +201,7 @@ namespace GXEZ
 		std::unordered_map<std::string, ImageSDL*>		_images;
 		// Text
 		std::unordered_map<std::string, Font>			_fonts;
-		Text											_textActive;
+		TextSDL											_textActive;
 		// Sprites
 		std::unordered_map<std::string, Sprite*>		_sprites;
 		Sprite* _spriteActive;
@@ -225,7 +247,7 @@ namespace GXEZ
 		class DrawerCircleBressenham
 		{
 		public:
-			DrawerCircleBressenham(Drawer2DSDL* drawer);
+			DrawerCircleBressenham(ImageDrawer2DSDL* drawer);
 			// Use X and Y as center for each parts
 			void	Draw(const int& _x, const int& _y, const Circle& circle);
 			// Use Part Parts Position
@@ -252,13 +274,13 @@ namespace GXEZ
 
 			Circle							_circle;
 			DrawCircleBressenhamFunction	_drawFct;
-			Drawer2DSDL* _drawer;
+			ImageDrawer2DSDL* _drawer;
 		};
 
 		class IDrawerRect
 		{
 		public:
-			IDrawerRect(Drawer2DSDL* drawer);
+			IDrawerRect(ImageDrawer2DSDL* drawer);
 
 		protected:
 			virtual void	DrawStart(const int& _x, const int& _y, Rect& rect);
@@ -270,7 +292,7 @@ namespace GXEZ
 
 			int				xr, yr;
 			InfoRect		_iR;
-			Drawer2DSDL* _drawer;
+			ImageDrawer2DSDL* _drawer;
 
 
 		private:
@@ -280,7 +302,7 @@ namespace GXEZ
 		class DrawerRect : public IDrawerRect
 		{
 		public:
-			DrawerRect(Drawer2DSDL* drawer) : IDrawerRect(drawer) {};
+			DrawerRect(ImageDrawer2DSDL* drawer) : IDrawerRect(drawer) {};
 			void	Draw(const int& _x, const int& _y, const Rect& rect);
 		private:
 			virtual void	DrawClassic() override;
@@ -292,7 +314,7 @@ namespace GXEZ
 		class DrawerRectBorder : public IDrawerRect
 		{
 		public:
-			DrawerRectBorder(Drawer2DSDL* drawer) : IDrawerRect(drawer) {};
+			DrawerRectBorder(ImageDrawer2DSDL* drawer) : IDrawerRect(drawer) {};
 			void	Draw(const int& _x, const int& _y, const RectBorder& rectBorder);
 		private:
 			virtual void	DrawClassic() override;

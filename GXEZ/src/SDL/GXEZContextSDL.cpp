@@ -1,5 +1,8 @@
 #include "GXEZ/SDL/GXEZContextSDL.h"
 
+// GXEZ
+#include "GXEZ/Graphic/SDL/RendererSDL.h"
+
 // STD //
 #include <set>
 
@@ -28,10 +31,23 @@ namespace GXEZ
 		atexit(SDL_Quit);
 		TTF_Quit();
 
-		SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-		TTF_Init();
-
 		_drawer = NULL;
+
+		if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
+		{
+			std::cerr << "GXEZContextSDL::Init() Couldn't initialize SDL: " << SDL_GetError() << std::endl;
+		}
+		if (TTF_Init() < 0)
+		{
+			std::cerr << "GXEZContextSDL::Init() Couldn't initialize SDL_TTF: " << TTF_GetError() << std::endl;
+		}
+		
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+	}
+
+	IGXEZContext::Type GXEZContextSDL::GetType() const
+	{
+		return (_type);
 	}
 
 	void GXEZContextSDL::Release()
@@ -72,19 +88,29 @@ namespace GXEZ
 	{
 	}
 
-	IDrawer2D* GXEZContextSDL::CreateDrawer2D()
+	IImageDrawer2D* GXEZContextSDL::CreateImageDrawer2D()
 	{
 		if (_drawer == NULL)
 		{
-			_drawer = new Drawer2DSDL(this, ColorFactory::Get().GetFormat());
-			std::cout << "GXEZContextSDL::CreateDrawer2D()" << std::endl;
+			_drawer = new ImageDrawer2DSDL(this, ColorFactory::Get().GetFormat());
+			std::cout << "GXEZContextSDL::CreateImageDrawer2D()" << std::endl;
 		}
 		return (_drawer);
 	}
 
-	void GXEZContextSDL::ReleaseDrawer2D(IDrawer2D* drawer)
+	void GXEZContextSDL::ReleaseImageDrawer2D(IImageDrawer2D* drawer)
 	{
 
+	}
+
+	IRenderer* GXEZContextSDL::GetRenderer(IWindow* window)
+	{
+		WindowSDL* windowSDL = dynamic_cast<WindowSDL*>(window);
+
+		if (windowSDL) {
+			return (RendererSDL::Get(windowSDL));
+		}
+		return (NULL);
 	}
 
 }

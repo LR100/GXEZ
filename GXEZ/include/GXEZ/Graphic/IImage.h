@@ -36,7 +36,7 @@ namespace GXEZ
 		virtual void				SetPixel(const unsigned int& x, const unsigned int& y, const unsigned char& r, const unsigned char& g, const unsigned char& b, const unsigned char& a) = 0;
 		virtual void				GetPixel(const unsigned int& x, const unsigned int& y, unsigned char& r, unsigned char& g, unsigned char& b) const = 0;
 		virtual void				GetPixel(const unsigned int& x, const unsigned int& y, unsigned char& r, unsigned char& g, unsigned char& b, unsigned char& a) const = 0;
-		virtual const ColorFormat& GetFormat() const = 0;
+		virtual const ColorFormat&  GetFormat() const = 0;
 		virtual const unsigned int& GetSizeLine() const = 0;
 		virtual const unsigned int& GetBytesPerPixel() const = 0;
 
