@@ -1,6 +1,10 @@
 #ifndef RENDERERSDL_H_
 #define RENDERERSDL_H_
 
+// STD
+#include <list>
+
+// GXEZ
 #include "GXEZ/Graphic/IRenderer.h"
 #include "GXEZ/Graphic/SDL/WindowSDL.h"
 
@@ -29,7 +33,13 @@ namespace GXEZ
 
 		// Window
 		virtual void	LinkWindow(IWindow* window) override;
-		virtual void	UseWindow(IWindow* window) override;
+
+		// Render Target
+		virtual void	SetRenderTarget(IWindow* window) override;
+		virtual void	SetRenderTarget(ATexture* texture) override;
+
+		// Textures
+		virtual ATexture* CreateTexture(const ATexture::Definition& definition, ATexture* texture = NULL) override;
 
 		// Scene Init and Render
 		virtual void	PrepareScene() override;
@@ -53,6 +63,7 @@ namespace GXEZ
 
 		RendererSDL(WindowSDL* windowSDL);
 
+		std::list<WindowSDL*>		_windowLinked;
 		SDL_Renderer*				_rendererUsed;
 	};
 }

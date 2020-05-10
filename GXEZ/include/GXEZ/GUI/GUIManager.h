@@ -2,7 +2,7 @@
 
 // GXEZ
 #include "GXEZ/Event/IEventHandler.h"
-#include "GXEZ/Graphic/IDrawer2D.h"
+#include "GXEZ/Graphic/IRenderer.h"
 #include "GXEZ/GUI/GUIItem.h"
 
 // STD
@@ -25,7 +25,7 @@ namespace GXEZ
 
 		// Link/Init
 		void			LinkEventHandler(IEventHandler* eventHandler);
-		void			LinkDrawer2D(IDrawer2D* drawer2D);
+		void			LinkRenderer(IRenderer* renderer);
 		unsigned int	LinkItem(GUIItem* item);
 
 		// Items
@@ -37,9 +37,9 @@ namespace GXEZ
 		class GUIScreen : public GUIItem
 		{
 		public:
-			GUIScreen(GUIManager* manager, IDrawer2D* drawer, const GUIItem::Definition& definition);
+			GUIScreen(GUIManager* manager, IRenderer* renderer, const GUIItem::Definition& definition);
 		private:
-			virtual void	OnDraw(IDrawer2D* drawer) override;
+			virtual void	OnDraw(IRenderer* renderer) override;
 			virtual void	CreateSprites() override;
 		};
 		 

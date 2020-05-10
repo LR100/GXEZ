@@ -252,7 +252,7 @@ namespace GXEZ
 		_linkedEventHandler->SetPriority(IEventHandler::Priority::MEDIUM);
 	}
 
-	void WindowSDL::LinkImageDrawer2D(IImageDrawer2D* drawer)
+	void WindowSDL::LinkImageDrawer2D(IRenderer* renderer)
 	{
 		// Only a drawer2D SDL is managed for the moment
 		_drawer = dynamic_cast<ImageDrawer2DSDL*>(drawer);

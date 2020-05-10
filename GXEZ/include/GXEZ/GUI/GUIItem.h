@@ -12,7 +12,7 @@
 using namespace MXEZ;
 
 // GXEZ
-#include "GXEZ/Graphic/IDrawer2D.h"
+#include "GXEZ/Graphic/IRenderer.h"
 #include "GXEZ/Graphic/Color.h"
 
 ///////////////////
@@ -129,11 +129,11 @@ namespace GXEZ
 			Background	background;
 		};
 
-		GUIItem(GUIManager* manager, GUIItem* parent, IImageDrawer2D* drawer, ItemType type, const GUIItem::Definition& definition);
+		GUIItem(GUIManager* manager, GUIItem* parent, IRenderer* renderer, ItemType type, const GUIItem::Definition& definition);
 
-		// Draw Sprites Into The Drawer
-		void				Draw(IImageDrawer2D* drawer);
-		void				DrawTree(IImageDrawer2D* drawer);
+		// Draw Textures Into The Drawer
+		void				Draw(IRenderer* renderer);
+		void				DrawTree(IRenderer* renderer);
 
 		const unsigned int& GetID() const;
 		const ItemType& GetType() const;
@@ -170,13 +170,13 @@ namespace GXEZ
 		void				SetDefinition(const GUIItem::Definition& definition);
 
 		// OVERRIDABLE //
-		virtual void		OnDraw(IImageDrawer2D* drawer) = 0;
+		virtual void		OnDraw(IRenderer* renderer) = 0;
 		virtual void		OnClick(bool state) {};
 		virtual void		OnHovered(bool state) {};
 		virtual void		OnVisible(bool state) {};
 
-		virtual void		CreateSprites() = 0;
-		void				ClearSprites();
+		virtual void		CreateTextures() = 0;
+		void				ClearTextures();
 
 		const int& GetRealPositionX() const;
 		const int& GetRealPositionY() const;
@@ -186,8 +186,8 @@ namespace GXEZ
 
 		// Drawing/Design
 		GUIItem::Definition		_definition;
-		std::vector<Sprite*>	_sprites;
-		IImageDrawer2D* _drawer;
+		std::vector<ATexture*>	_textures;
+		IRenderer*				_renderer;
 
 
 
@@ -253,7 +253,7 @@ namespace GXEZ
 			DefinitionHovered clicked;
 		};
 
-		GUIButton(GUIManager* manager, GUIItem* parent, IDrawer2D* drawer, const GUIButton::Definition& definition);
+		GUIButton(GUIManager* manager, GUIItem* parent, IRenderer* renderer, const GUIButton::Definition& definition);
 
 
 		void			SetDefinitionButton(const GUIButton::Definition& definition);
@@ -270,18 +270,18 @@ namespace GXEZ
 	private:
 
 		// Overridable
-		virtual void	OnDraw(IDrawer2D* drawer) override;
+		virtual void	OnDraw(IRenderer* renderer) override;
 		virtual void	OnClick(bool state) override;
 
 		// Draw
-		virtual void	CreateSprites() override;
-		Sprite*			CreateSpriteBase(const GUIItem::Definition::Border& border, const GUIItem::Definition::Background& background);
-		void			CreateSpriteNormal();
-		void			CreateSpriteHovered();
-		void			CreateSpriteClicked();
+		virtual void	CreateTextures() override;
+		ATexture*		CreateTextureBase(const GUIItem::Definition::Border& border, const GUIItem::Definition::Background& background);
+		void			CreateTextureNormal();
+		void			CreateTextureHovered();
+		void			CreateTextureClicked();
 
 		GUIButton::Definition		_definitionButton;
-		// Sprite 0 is Classic - Sprite 1 is Hovered
+		// Texture 0 is Classic - Texture 1 is Hovered
 
 		Handler* _onClickHandler;
 	};
@@ -290,10 +290,10 @@ namespace GXEZ
 	class GUICanvas : public GUIItem
 	{
 	public:
-		GUICanvas(GUIManager* manager, GUIItem* parent, IDrawer2D* drawer, const GUIItem::Definition& definition);
+		GUICanvas(GUIManager* manager, GUIItem* parent, IRenderer* renderer, const GUIItem::Definition& definition);
 	private:
-		virtual void	OnDraw(IDrawer2D* drawer) override;
-		virtual void	CreateSprites() override;
+		virtual void	OnDraw(IRenderer* renderer) override;
+		virtual void	CreateTextures() override;
 	};
 	//
 	//class GUIImage : public GUIItem
@@ -317,11 +317,11 @@ namespace GXEZ
 	//
 	//private:
 	//
-	//	virtual void	CreateSprites(IImageDrawer2D* drawer) override;
+	//	virtual void	CreateTextures(IImageDrawer2D* drawer) override;
 	//
 	//	GUIImage::Definition		_definition;
 	//	GUIImage::Definition		_definitionHovered;
-	//	// Sprite 0 is Classic // Sprite 1 is Hovered
+	//	// Texture 0 is Classic // Texture 1 is Hovered
 	//	bool		_isHovered;
 	//};
 

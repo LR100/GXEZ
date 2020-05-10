@@ -72,12 +72,6 @@
     <ClInclude Include="include\GXEZ\IGXEZContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\GXEZ\GUI\GUIItem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GXEZ\GUI\GUIManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\GXEZ\Tool\FPSComputer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -97,6 +91,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\GXEZ\Graphic\IDrawer2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GXEZ\Graphic\ATexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GXEZ\Graphic\SDL\TextureSDL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -140,12 +140,6 @@
     <ClCompile Include="src\SDL\GXEZContextSDL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GUI\GUIItem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GUI\GUIManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Graphic\IDrawer2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -159,6 +153,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Graphic\SDL\ImageDrawer2DSDL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphic\ATexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphic\SDL\TextureSDL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

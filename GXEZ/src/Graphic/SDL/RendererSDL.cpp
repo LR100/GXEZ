@@ -1,8 +1,8 @@
 #include "GXEZ/Graphic/SDL/RendererSDL.h"
+#include "GXEZ/Graphic/SDL/TextureSDL.h"
 
 namespace GXEZ
 {
-
 	RendererSDL* RendererSDL::_singleton = NULL;
 
 	RendererSDL::RendererSDL(WindowSDL* windowSDL) : IRenderer(windowSDL)
@@ -18,16 +18,49 @@ namespace GXEZ
 		{
 			_rendererUsed = SDL_CreateRenderer(windowSDL->GetSDLWindow(), -1, SDL_RENDERER_ACCELERATED);
 			windowSDL->SetSDLRenderer(_rendererUsed);
+			_windowLinked.push_back(windowSDL);
 		}
 	}
 
-	void RendererSDL::UseWindow(IWindow* window)
+	void RendererSDL::SetRenderTarget(IWindow* window)
 	{
 		WindowSDL* windowSDL = dynamic_cast<WindowSDL*>(window);
 		if (windowSDL) {
-			_rendererUsed = windowSDL->GetSDLRenderer();
+			_rendererUsed = windowSDL->GetSDLRenderer();	
 		}
 	}
+
+	void RendererSDL::SetRenderTarget(ATexture* texture)
+	{
+		// If no renderer currently used - use one from any linked window (SDL have one renderer per window)
+		if (!_rendererUsed)
+		{
+			std::list<WindowSDL*>::iterator iter = _windowLinked.begin();
+			std::list<WindowSDL*>::iterator iterEnd = _windowLinked.end();
+			for (; iter != iterEnd; iter++) {
+				if ((*iter)->GetSDLRenderer()) {
+					_rendererUsed = (*iter)->GetSDLRenderer();
+					iter = iterEnd;
+				}
+			}
+		}
+	}
+
+	ATexture* RendererSDL::CreateTexture(const ATexture::Definition& definition, ATexture* texture)
+	{
+		ATexture* ntexture;
+
+		if (texture == NULL)
+		{
+			ntexture = new TextureSDL(definition, this);
+		}
+		else {
+			ntexture = texture;
+		}
+		return (ntexture);
+	}
+
+
 
 	void RendererSDL::PrepareScene()
 	{
@@ -42,6 +75,7 @@ namespace GXEZ
 
 	void RendererSDL::DrawPoint(const Vec2i& pos, const Color& color)
 	{
+
 	}
 
 	void RendererSDL::DrawLine(const Vec2i& a, const Vec2i& b, const Color& color)

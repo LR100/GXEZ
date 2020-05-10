@@ -4,16 +4,16 @@
 #include "GXEZ/GUI/GUIManager.h"
 
 // STD
-#include <sstream> // For Sprite Image IDS
+#include <sstream> // For Texture Image IDS
 
 
 namespace GXEZ
 {
-	GUIItem::GUIItem(GUIManager* manager, GUIItem* parent, IImageDrawer2D* drawer, GUIItem::ItemType type, const GUIItem::Definition& definition)
+	GUIItem::GUIItem(GUIManager* manager, GUIItem* parent, IRenderer* renderer, GUIItem::ItemType type, const GUIItem::Definition& definition)
 	{
 		_id = 0;
 		_type = type;
-		_drawer = drawer;
+		_renderer = renderer;
 		_parent = NULL;
 		_realPositionX = 0;
 		_realPositionY = 0;
@@ -35,21 +35,21 @@ namespace GXEZ
 		}
 	}
 
-	void GUIItem::Draw(IImageDrawer2D* drawer)
+	void GUIItem::Draw(IRenderer* renderer)
 	{
 		if (_isVisible) {
-			OnDraw(drawer);
+			OnDraw(renderer);
 		}
 	}
 
-	void GUIItem::DrawTree(IImageDrawer2D* drawer)
+	void GUIItem::DrawTree(IRenderer* renderer)
 	{
 		// std::cout << "GUIItem::DrawTree()" << std::endl;
 		// Draw This
-		Draw(drawer);
+		Draw(renderer);
 		// Then Draw Children
 		for (size_t i = 0; i < _children.size(); i += 1) {
-			_children.at(i)->DrawTree(drawer);
+			_children.at(i)->DrawTree(renderer);
 		}
 	}
 
@@ -175,15 +175,15 @@ namespace GXEZ
 		return (_definition.zIndex);
 	}
 
-	void GUIItem::ClearSprites()
+	void GUIItem::ClearTextures()
 	{
-		for (size_t i = 0; i < _sprites.size(); i += 1)
+		for (size_t i = 0; i < _textures.size(); i += 1)
 		{
-			if (_sprites.at(i) != NULL) {
-				delete (_sprites.at(i));
+			if (_textures.at(i) != NULL) {
+				delete (_textures.at(i));
 			}
 		}
-		_sprites.clear();
+		_textures.clear();
 	}
 
 	const int& GUIItem::GetRealPositionX() const
@@ -251,7 +251,7 @@ namespace GXEZ
 		_aabb.ComputeMinMax();
 	}
 
-	GUIButton::GUIButton(GUIManager* manager, GUIItem* parent, IImageDrawer2D* drawer, const GUIButton::Definition& definition) : GUIItem(manager, parent, drawer, GUIItem::ItemType::BUTTON, definition)
+	GUIButton::GUIButton(GUIManager* manager, GUIItem* parent, IRenderer* renderer, const GUIButton::Definition& definition) : GUIItem(manager, parent, renderer, GUIItem::ItemType::BUTTON, definition)
 	{
 		SetDefinitionButton(definition);
 		_onClickHandler = NULL;
@@ -267,24 +267,24 @@ namespace GXEZ
 		}
 	}
 
-	void GUIButton::CreateSprites()
+	void GUIButton::CreateTextures()
 	{
-		ClearSprites();
-		CreateSpriteNormal();
-		CreateSpriteHovered();
-		CreateSpriteClicked();
+		ClearTextures();
+		CreateTextureNormal();
+		CreateTextureHovered();
+		CreateTextureClicked();
 	}
 
-	Sprite* GUIButton::CreateSpriteBase(const GUIItem::Definition::Border& border, const GUIItem::Definition::Background& background)
+	ATexture* GUIButton::CreateTextureBase(const GUIItem::Definition::Border& border, const GUIItem::Definition::Background& background)
 	{
-		Sprite* sprite;
+		ATexture* sprite;
 
 		std::stringstream	ss;
 		ss << GetID();
 		ss << "buttonSB";
 		// Create Image & USE it
-		IImage* imageBuffer = _drawer->CreateImage(ss.str(), GetRealSizeWidth(), GetRealSizeHeight());
-		_drawer->UseImage(ss.str());
+		IImage* imageBuffer = _renderer->CreateImage(ss.str(), GetRealSizeWidth(), GetRealSizeHeight());
+		_renderer->UseImage(ss.str());
 
 		////// DRAW //////
 		// Button Borders
@@ -295,9 +295,9 @@ namespace GXEZ
 		rectBorder.color = border.color;
 		rectBorder.size = border.size; // Convert Needed from UnitType
 		rectBorder.radius = border.radius;
-		std::cout << "GUIButton::CreateSpriteBase Border Radius (" << border.radius << ")" << std::endl;
+		std::cout << "GUIButton::CreateTextureBase Border Radius (" << border.radius << ")" << std::endl;
 
-		_drawer->DrawRectBorder(0, 0, rectBorder);
+		_renderer->DrawRectBorder(0, 0, rectBorder);
 
 		// BackGround
 		IImageDrawer2D::Rect rect;
@@ -307,7 +307,7 @@ namespace GXEZ
 		rect.color = background.color;
 		rect.radius = border.radius;
 
-		_drawer->DrawRect(int(border.size), int(border.size), rect);
+		_renderer->DrawRect(int(border.size), int(border.size), rect);
 
 		///// CIRCLE TEST /////
 
@@ -319,80 +319,80 @@ namespace GXEZ
 
 		//circle.color = Color::RED();
 		//circle.part = IImageDrawer2D::Circle::Part::TOP_LEFT;
-		//_drawer->DrawCircle(pc.x, pc.y, circle);
+		//_renderer->DrawCircle(pc.x, pc.y, circle);
 
 		//circle.color = Color::GREEN();
 		//circle.part = IImageDrawer2D::Circle::Part::TOP_RIGHT;
-		//_drawer->DrawCircle(pc.x, pc.y, circle);
+		//_renderer->DrawCircle(pc.x, pc.y, circle);
 
 		//circle.color = Color::YELLOW();
 		//circle.part = IImageDrawer2D::Circle::Part::BOTTOM_LEFT;
-		//_drawer->DrawCircle(pc.x, pc.y, circle);
+		//_renderer->DrawCircle(pc.x, pc.y, circle);
 
 		//circle.color = Color::BLUE();
 		//circle.part = IImageDrawer2D::Circle::Part::BOTTOM_RIGHT;
-		//_drawer->DrawCircle(pc.x, pc.y, circle);
+		//_renderer->DrawCircle(pc.x, pc.y, circle);
 
 		imageBuffer->Export("test");
 
 		ColorDef	colorDefTransparency;
-		sprite = new Sprite(imageBuffer, colorDefTransparency);
+		sprite = new Texture(imageBuffer, colorDefTransparency);
 		// Remove Image
-		_drawer->RemoveImage(ss.str());
+		_renderer->RemoveImage(ss.str());
 
 		return (sprite);
 	}
 
-	void GUIButton::CreateSpriteNormal()
+	void GUIButton::CreateTextureNormal()
 	{
-		_sprites.push_back(CreateSpriteBase(_definitionButton.border, _definitionButton.background));
+		_textures.push_back(CreateTextureBase(_definitionButton.border, _definitionButton.background));
 	}
 
-	void GUIButton::CreateSpriteHovered()
+	void GUIButton::CreateTextureHovered()
 	{
-		_sprites.push_back(CreateSpriteBase(_definitionButton.hovered.border, _definitionButton.hovered.background));
+		_textures.push_back(CreateTextureBase(_definitionButton.hovered.border, _definitionButton.hovered.background));
 	}
 
-	void GUIButton::CreateSpriteClicked()
+	void GUIButton::CreateTextureClicked()
 	{
-		_sprites.push_back(CreateSpriteBase(_definitionButton.clicked.border, _definitionButton.clicked.background));
+		_textures.push_back(CreateTextureBase(_definitionButton.clicked.border, _definitionButton.clicked.background));
 	}
 
-	void GUIButton::OnDraw(IImageDrawer2D* drawer)
+	void GUIButton::OnDraw(IRenderer* renderer)
 	{
 		//std::cout << "GUIButton::Draw()" << std::endl;
 		if (IsClicked())
-		{ // Draw Cliked Sprite
-			drawer->DrawSprite(GetRealPositionX(), GetRealPositionY(), _sprites.at(2));
+		{ // Draw Cliked Texture
+			renderer->DrawTexture(GetRealPositionX(), GetRealPositionY(), _textures.at(2));
 		}
 		else if (IsHovered())
-		{ // Draw Hovered Sprite
-			drawer->DrawSprite(GetRealPositionX(), GetRealPositionY(), _sprites.at(1));
+		{ // Draw Hovered Texture
+			renderer->DrawTexture(GetRealPositionX(), GetRealPositionY(), _textures.at(1));
 		}
 		else
-		{ // Draw Normal Sprite
-			drawer->DrawSprite(GetRealPositionX(), GetRealPositionY(), _sprites.at(0));
+		{ // Draw Normal Texture
+			renderer->DrawTexture(GetRealPositionX(), GetRealPositionY(), _textures.at(0));
 		}
 	}
 
 	void GUIButton::SetDefinitionButton(const GUIButton::Definition& definition)
 	{
 		_definitionButton = definition;
-		CreateSprites();
+		CreateTextures();
 	}
 
-	GUICanvas::GUICanvas(GUIManager* manager, GUIItem* parent, IImageDrawer2D* drawer, const GUIItem::Definition& definition) : GUIItem(manager, parent, drawer, GUIItem::ItemType::BUTTON, definition)
+	GUICanvas::GUICanvas(GUIManager* manager, GUIItem* parent, IRenderer* renderer, const GUIItem::Definition& definition) : GUIItem(manager, parent, renderer, GUIItem::ItemType::BUTTON, definition)
 	{
 	}
 
-	void GUICanvas::OnDraw(IImageDrawer2D* drawer)
+	void GUICanvas::OnDraw(IRenderer* renderer)
 	{
 		// Do Nothing
 	}
 
-	void GUICanvas::CreateSprites()
+	void GUICanvas::CreateTextures()
 	{
-		// No Sprite
+		// No Texture
 	}
 
 	GUIItem::Handler::Handler(std::function<void()> f) : _function(f)
