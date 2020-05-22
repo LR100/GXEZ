@@ -3,7 +3,7 @@
 
 #include "GXEZ/Graphic/IDrawer2D.h"
 #include "GXEZ/Graphic/IWindow.h"
-#include "GXEZ/Graphic/ATexture.h"
+#include "GXEZ/Graphic/ATexture2D.h"
 
 namespace GXEZ
 {
@@ -17,17 +17,18 @@ namespace GXEZ
 
 		// Renders targets can be or a window or a texture
 
-		virtual void SetRenderTarget(IWindow* window) = 0;
-		virtual void SetRenderTarget(ATexture* texture) = 0;
+		virtual void		SetRenderTarget(IWindow* window) = 0;
+		virtual void		SetRenderTarget(ATexture2D* texture) = 0;
 
 		// Textures
-		virtual ATexture* CreateTexture(const ATexture::Definition& definition, ATexture* texture = NULL) = 0;
+		virtual ATexture2D* CreateTexture2D(const ATexture2D::Definition& definition, ATexture2D* texture = NULL) = 0;
+
+		virtual void		DrawTexture(const Vec2i& pos, ATexture2D* texture, float rotation = 0) = 0;
 
 		/// Scenes
-		virtual void PrepareScene() = 0;
-		virtual void PresentScene() = 0;
+		virtual void		PrepareScene() = 0;
+		virtual void		PresentScene() = 0;
 	};
-
 }
 
 #endif // !IRENDERER_H_

@@ -8,6 +8,7 @@
 
 // MXEZ
 #include "MXEZ/AABB/AABB.h"
+#include "MXEZ/Vec/Vec.h"
 
 using namespace MXEZ;
 
@@ -131,28 +132,29 @@ namespace GXEZ
 
 		GUIItem(GUIManager* manager, GUIItem* parent, IRenderer* renderer, ItemType type, const GUIItem::Definition& definition);
 
-		// Draw Textures Into The Drawer
+		// Modifications //
+		void				Resize(const Definition::Size& size);
+
+
+		// Draw Textures Into The Render Target
 		void				Draw(IRenderer* renderer);
 		void				DrawTree(IRenderer* renderer);
 
+		// Properties Getters
 		const unsigned int& GetID() const;
-		const ItemType& GetType() const;
-		const AABB2i& GetAABB() const;
+		const ItemType&		GetType() const;
+		const AABB2i&		GetAABB() const;
+		const Definition&	GetDefinition() const;
 
-
-		const Definition& GetDefinition() const;
-
+		// Tree Methods
 		void				SetParent(GUIItem* item);
-		GUIItem* GetParent() const;
+		GUIItem*			GetParent() const;
 		void				AddChild(GUIItem* item);
 		void				RemoveChildren(GUIItem* item);
 
-
-
-
-		////////////////
-		// Properties // // Manually Get/Set Properties
-		////////////////
+		////////////////////////
+		// Graphic Properties // 
+		////////////////////////
 		void				SetHovered(bool state);
 		const bool&			IsHovered() const;
 
@@ -174,25 +176,30 @@ namespace GXEZ
 		virtual void		OnClick(bool state) {};
 		virtual void		OnHovered(bool state) {};
 		virtual void		OnVisible(bool state) {};
+		
 
 		virtual void		CreateTextures() = 0;
 		void				ClearTextures();
 
-		const int& GetRealPositionX() const;
-		const int& GetRealPositionY() const;
-
-		const int& GetRealSizeWidth() const;
-		const int& GetRealSizeHeight() const;
+		const Vec2i&		GetRealPosition() const;
+		const Vec2i&		GetRealSize() const;
 
 		// Drawing/Design
-		GUIItem::Definition		_definition;
-		std::vector<ATexture*>	_textures;
-		IRenderer*				_renderer;
+		GUIItem::Definition			_definition;
+		std::vector<ATexture2D*>	_textures;
+		IRenderer*					_renderer;
 
 
 
 	private:
 
+		virtual void			OnResizeParent();
+
+
+		// Events
+		void					OnSizeChanged();
+
+		// Compute Changes
 		void					ComputeRealPosition();
 		void					ComputeRealSize();
 		void					ComputeAABB();
@@ -206,8 +213,8 @@ namespace GXEZ
 		GUIItem* _parent;
 		std::vector<GUIItem*>	_children;
 		// Real Properties
-		int						_realPositionX, _realPositionY; // Can Be Negative
-		unsigned int			_realSizeWidth, _realSizeHeight;
+		Vec2i					_realPosition; // Can Be Negative
+		Vec2i					_realSize;
 		AABB2i					_aabb;
 
 		// Drawing/Design Properties
@@ -233,21 +240,21 @@ namespace GXEZ
 				size.width = 60;
 				size.height = 20;
 
-				background.color = Color(200, 200, 200);
+				background.color = Color(200, 200, 200, 255);
 				border.size = 1;
 				border.radius = 10;
 				border.color = Color(170, 170, 170);
 
 				// Hovered 
-				hovered.background.color = Color(215, 215, 240);
+				hovered.background.color = Color(215, 215, 240, 255);
 				hovered.border.size = 1;
 				hovered.border.radius = border.radius;
 				hovered.border.color = Color(190, 190, 220);
 				// Clicked
-				clicked.background.color = Color(235, 235, 235);
+				clicked.background.color = Color(235, 235, 235, 255);
 				clicked.border.size = 1;
 				clicked.border.radius = border.radius;
-				clicked.border.color = Color(230, 230, 245);
+				clicked.border.color = Color(230, 230, 245, 255);
 			}
 			DefinitionHovered hovered;
 			DefinitionHovered clicked;
@@ -272,10 +279,12 @@ namespace GXEZ
 		// Overridable
 		virtual void	OnDraw(IRenderer* renderer) override;
 		virtual void	OnClick(bool state) override;
+		virtual void	OnResize() {};
+
 
 		// Draw
 		virtual void	CreateTextures() override;
-		ATexture*		CreateTextureBase(const GUIItem::Definition::Border& border, const GUIItem::Definition::Background& background);
+		ATexture2D*		CreateTextureBase(const GUIItem::Definition::Border& border, const GUIItem::Definition::Background& background);
 		void			CreateTextureNormal();
 		void			CreateTextureHovered();
 		void			CreateTextureClicked();

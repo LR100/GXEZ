@@ -13,17 +13,15 @@ namespace GXEZ
 		for (unsigned int i = 1; i < GUI_MANAGER_ITEMS_MAX; i += 1) { // Items IDs start at 1 !!!!!
 			_itemsAvailablesIDs.push_back(i);
 		}
-		GUIItem::Definition screenDef;
-
-
-		screenDef.size.width = (float)_width;
-		screenDef.size.height = (float)_height;
-		screenDef.size.type = GUIItem::UnitType::ABSOLUTE_PX;
+		
+		_screenDef.size.width = (float)_width;
+		_screenDef.size.height = (float)_height;
+		_screenDef.size.type = GUIItem::UnitType::ABSOLUTE_PX;
 
 		AABB2i	screenMaxAABB(Vec2i(5000, 5000), Vec2i(5000, 5000));
 
 		_tree = new QuadTreeAABB2T<int, GUIItem*>(screenMaxAABB, 10);
-		_itemScreen = new GUIScreen(this, NULL, screenDef);
+		_itemScreen = new GUIScreen(this, NULL, _screenDef);
 
 	}
 
@@ -31,15 +29,17 @@ namespace GXEZ
 	{
 		_width = width;
 		_height = height;
+		_screenDef.size.width = (float)_width;
+		_screenDef.size.height = (float)_height;
 		// TODO : Resize all Items
-
+		_itemScreen->Resize(_screenDef.size);
 	}
 
 	void GUIManager::Draw()
 	{
 		//std::cout << "GUIManager::Draw()" << std::endl;
 		// MUST BE OPTIMIZED
-		_itemScreen->DrawTree(_drawer2D);
+		_itemScreen->DrawTree(_renderer);
 
 	}
 
@@ -51,10 +51,15 @@ namespace GXEZ
 		_eventHandler->AddHandlerToEvent(ControlKey::MOUSE_LEFT, ControlKeyState::RELEASED, &GUIManager::EventMouseLeftRelease, this);
 	}
 
-	void GUIManager::LinkDrawer2D(IDrawer2D* drawer2D)
+	void GUIManager::LinkRenderer(IRenderer* renderer)
 	{
-		_drawer2D = drawer2D;
+		_renderer = renderer;
 	}
+
+	//void GUIManager::LinkDrawer2D(IDrawer2D* drawer2D)
+	//{
+	//	_renderer = drawer2D;
+	//}
 
 	unsigned int GUIManager::LinkItem(GUIItem* item)
 	{
@@ -86,7 +91,7 @@ namespace GXEZ
 		else {
 			nparent = parent;
 		}
-		GUIButton* button = new GUIButton(this, nparent, _drawer2D, definition);
+		GUIButton* button = new GUIButton(this, nparent, _renderer, definition);
 		std::cout << "Create GUIButton with AABB (" << button->GetAABB().ToString() << ")" << std::endl;
 		return (button);
 	}
@@ -162,16 +167,16 @@ namespace GXEZ
 		_itemsClicked.clear();
 	}
 
-	GUIManager::GUIScreen::GUIScreen(GUIManager* manager, IImageDrawer2D* drawer, const GUIItem::Definition& definition) : GUIItem(NULL, NULL, drawer, GUIItem::ItemType::NONE, definition)
+	GUIManager::GUIScreen::GUIScreen(GUIManager* manager, IRenderer* renderer, const GUIItem::Definition& definition) : GUIItem(NULL, NULL, renderer, GUIItem::ItemType::NONE, definition)
 	{
 		GUIItem::SetDefinition(definition);
 	}
 
-	void GUIManager::GUIScreen::OnDraw(IImageDrawer2D* drawer)
+	void GUIManager::GUIScreen::OnDraw(IRenderer* renderer)
 	{
 	}
 
-	void GUIManager::GUIScreen::CreateSprites()
+	void GUIManager::GUIScreen::CreateTextures()
 	{
 	}
 

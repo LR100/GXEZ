@@ -40,7 +40,7 @@ namespace GXEZ
 			GUIScreen(GUIManager* manager, IRenderer* renderer, const GUIItem::Definition& definition);
 		private:
 			virtual void	OnDraw(IRenderer* renderer) override;
-			virtual void	CreateSprites() override;
+			virtual void	CreateTextures() override;
 		};
 		 
 		// Event Handling //
@@ -63,13 +63,15 @@ namespace GXEZ
 		GUIItem* _itemHovered; // Top Foreground
 		// Root Item
 		GUIItem* _itemScreen;
+		GUIItem::Definition _screenDef;
 
 		QuadTreeAABB2T<int, GUIItem*>* _tree;
 
 		// Basics
 		unsigned int			_width, _height;
-		IEventHandler* _eventHandler;
-		IDrawer2D*	 _drawer2D;
+		IEventHandler*			_eventHandler;
+		IRenderer*				_renderer;
+		//IDrawer2D*	 _drawer2D;
 	};
 
 }

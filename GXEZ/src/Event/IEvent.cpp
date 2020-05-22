@@ -65,7 +65,7 @@ namespace GXEZ
 	{
 		std::stringstream ss;
 
-		ss << "Hash (" << GetHash() << ") Type (" << EventTypeToString(_def.type) << ")";
+		ss << "Hash (" << GetHash() << ") Type (" << EventTypeToString(_def.type) << ") IdD (" << _def.idDevice << ") Key";
 		if (_def.type == Event::Type::KEY)
 			ss << " (" << (unsigned char)_def.key << ") (" << ControlKeyStateToString(_def.state) << ")";
 		else if (_def.type == Event::Type::MOUSE)
@@ -74,7 +74,7 @@ namespace GXEZ
 		}
 		else if (_def.type == Event::Type::WINDOW)
 		{
-			ss << "(" << _def.idDevice << ") (" << ControlKeyWindowToString(_def.key) << ")";
+			ss << "(" << _def.idDevice << ") (" << ControlKeyWindowToString(_def.key) << ") State (" << int(_def.state) << ")";
 		}
 		ss << std::endl;
 		return (ss.str());

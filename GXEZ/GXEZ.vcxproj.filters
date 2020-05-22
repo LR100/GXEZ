@@ -93,10 +93,16 @@
     <ClInclude Include="include\GXEZ\Graphic\IDrawer2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\GXEZ\Graphic\ATexture.h">
+    <ClInclude Include="include\GXEZ\Graphic\ATexture2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\GXEZ\Graphic\SDL\TextureSDL.h">
+    <ClInclude Include="include\GXEZ\Graphic\SDL\Texture2DSDL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GXEZ\GUI\GUIManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GXEZ\GUI\GUIItem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -155,10 +161,16 @@
     <ClCompile Include="src\Graphic\SDL\ImageDrawer2DSDL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Graphic\ATexture.cpp">
+    <ClCompile Include="src\Graphic\ATexture2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Graphic\SDL\TextureSDL.cpp">
+    <ClCompile Include="src\Graphic\SDL\Texture2DSDL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\GUIItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GUI\GUIManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

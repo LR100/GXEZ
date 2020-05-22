@@ -5,7 +5,7 @@
 #include "GXEZ/GXEZEnvironment.h"
 
 // GUI
-// #include "GXEZ/GUI/GUIManager.h"
+#include "GXEZ/GUI/GUIManager.h"
 
 // Tool
 #include "GXEZ/Tool/Timer.h"

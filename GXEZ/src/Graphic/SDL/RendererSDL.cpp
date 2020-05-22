@@ -1,5 +1,5 @@
 #include "GXEZ/Graphic/SDL/RendererSDL.h"
-#include "GXEZ/Graphic/SDL/TextureSDL.h"
+#include "GXEZ/Graphic/SDL/Texture2DSDL.h"
 
 namespace GXEZ
 {
@@ -17,6 +17,8 @@ namespace GXEZ
 		if (windowSDL)
 		{
 			_rendererUsed = SDL_CreateRenderer(windowSDL->GetSDLWindow(), -1, SDL_RENDERER_ACCELERATED);
+			
+			
 			windowSDL->SetSDLRenderer(_rendererUsed);
 			_windowLinked.push_back(windowSDL);
 		}
@@ -26,33 +28,44 @@ namespace GXEZ
 	{
 		WindowSDL* windowSDL = dynamic_cast<WindowSDL*>(window);
 		if (windowSDL) {
-			_rendererUsed = windowSDL->GetSDLRenderer();	
+			SetRenderTarget(windowSDL);
 		}
 	}
 
-	void RendererSDL::SetRenderTarget(ATexture* texture)
+	void RendererSDL::SetRenderTarget(WindowSDL* windowSDL)
 	{
-		// If no renderer currently used - use one from any linked window (SDL have one renderer per window)
-		if (!_rendererUsed)
-		{
-			std::list<WindowSDL*>::iterator iter = _windowLinked.begin();
-			std::list<WindowSDL*>::iterator iterEnd = _windowLinked.end();
-			for (; iter != iterEnd; iter++) {
-				if ((*iter)->GetSDLRenderer()) {
-					_rendererUsed = (*iter)->GetSDLRenderer();
-					iter = iterEnd;
-				}
-			}
+		// std::cout << "SetRenderTarget(Window) SDL" << std::endl;
+		_rendererUsed = windowSDL->GetSDLRenderer();
+		SDL_SetRenderDrawBlendMode(_rendererUsed, SDL_BLENDMODE_NONE);
+		SDL_SetRenderTarget(_rendererUsed, NULL);
+	}
+
+	void RendererSDL::SetRenderTarget(ATexture2D* texture)
+	{
+		Texture2DSDL* textureSDL = dynamic_cast<Texture2DSDL*>(texture);
+		if (textureSDL) {
+			SetRenderTarget(textureSDL);
 		}
 	}
 
-	ATexture* RendererSDL::CreateTexture(const ATexture::Definition& definition, ATexture* texture)
+	void RendererSDL::SetRenderTarget(Texture2DSDL* texture)
 	{
-		ATexture* ntexture;
+		// std::cout << "SetRenderTarget(Texture) SDL" << std::endl;
+		//// If no renderer currently used - use one from any linked window (SDL have one renderer per window)
+		if (FindRendererSDL()) {
+			// SDL_SetRenderDrawBlendMode(_rendererUsed, SDL_BLENDMODE_NONE);
+			SDL_SetRenderTarget(_rendererUsed, texture->GetSDLTexture());
+		}
+	}
+
+	ATexture2D* RendererSDL::CreateTexture2D(const ATexture2D::Definition& definition, ATexture2D* texture)
+	{
+		ATexture2D* ntexture;
 
 		if (texture == NULL)
 		{
-			ntexture = new TextureSDL(definition, this);
+			std::cout << "Create Texture SDL" << std::endl;
+			ntexture = new Texture2DSDL(definition, this);
 		}
 		else {
 			ntexture = texture;
@@ -60,11 +73,10 @@ namespace GXEZ
 		return (ntexture);
 	}
 
-
-
 	void RendererSDL::PrepareScene()
 	{
-		SDL_SetRenderDrawColor(_rendererUsed, 0, 0, 0, 255);
+		SDL_SetRenderDrawColor(_rendererUsed, 10, 0, 0, 255);
+		// SDL_SetRenderDrawBlendMode(_rendererUsed, SDL_BLENDMODE_BLEND);
 		SDL_RenderClear(_rendererUsed);
 	}
 
@@ -86,10 +98,17 @@ namespace GXEZ
 
 	void RendererSDL::DrawRectBorder(const Vec2i& pos, const RectBorder& borderdef)
 	{
+
 	}
 
 	void RendererSDL::DrawRect(const Vec2i& pos, const Rect& rect)
 	{
+		SDL_SetRenderDrawColor(_rendererUsed, rect.color.r(), rect.color.g(), rect.color.b(), rect.color.a());
+		_rectSDL.x = pos.x;
+		_rectSDL.y = pos.y;
+		_rectSDL.w = rect.width;
+		_rectSDL.h = rect.height;
+		SDL_RenderDrawRect(_rendererUsed, &_rectSDL);
 	}
 
 	void RendererSDL::DrawCircle(const Vec2i& pos, const Circle& circle)
@@ -100,4 +119,66 @@ namespace GXEZ
 	{
 	}
 
+	void RendererSDL::DrawTexture(const Vec2i& pos, ATexture2D* texture, float rotation)
+	{
+		Texture2DSDL* textureSDL = dynamic_cast<Texture2DSDL*>(texture);
+		if (textureSDL) {
+			DrawTexture(pos, textureSDL, rotation);
+		}
+	}
+
+	void RendererSDL::DrawTexture(const Vec2i& pos, Texture2DSDL* textureSDL, float rotation)
+	{
+		if (_rendererUsed) {
+			_rectSDL.x = pos.x;
+			_rectSDL.y = pos.y;
+			_rectSDL.w = textureSDL->GetDefinition().size.x;
+			_rectSDL.h = textureSDL->GetDefinition().size.y;
+			if (rotation == 0)
+			{
+				SDL_RenderCopy(_rendererUsed, textureSDL->GetSDLTexture(), NULL, &_rectSDL);
+			}
+			else 
+			{
+				SDL_RenderCopyEx(_rendererUsed, textureSDL->GetSDLTexture(), NULL, &_rectSDL, rotation, NULL, SDL_FLIP_NONE);
+			}
+		}
+	}
+
+	SDL_Renderer* RendererSDL::GetRendererUsed()
+	{
+		if (FindRendererSDL()) {
+			return (_rendererUsed);
+		}
+		return (NULL);
+	}
+
+
+	/////////////////////////////
+	/// PRIVATE METHODS /////////
+	/////////////////////////////
+
+
+	bool RendererSDL::FindRendererSDL()
+	{
+		if (!_rendererUsed)
+		{
+			std::list<WindowSDL*>::iterator iter = _windowLinked.begin();
+			std::list<WindowSDL*>::iterator iterEnd = _windowLinked.end();
+			for (; iter != iterEnd; iter++) {
+				if ((*iter)->GetSDLRenderer()) {
+					_rendererUsed = (*iter)->GetSDLRenderer();
+					iter = iterEnd;
+				}
+			}
+			if (_rendererUsed != NULL) {
+				return (true);
+			}
+			return (false);
+		}
+		else
+		{
+			return (true);
+		}
+	}
 }

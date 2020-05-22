@@ -33,7 +33,7 @@ namespace GXEZ
 
 		_drawer = NULL;
 
-		if (SDL_Init(SDL_INIT_VIDEO) < 0)
+		if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0)
 		{
 			std::cerr << "GXEZContextSDL::Init() Couldn't initialize SDL: " << SDL_GetError() << std::endl;
 		}
@@ -98,7 +98,7 @@ namespace GXEZ
 		return (_drawer);
 	}
 
-	void GXEZContextSDL::ReleaseImageDrawer2D(IRenderer* renderer)
+	void GXEZContextSDL::ReleaseImageDrawer2D(IImageDrawer2D* drawer)
 	{
 
 	}

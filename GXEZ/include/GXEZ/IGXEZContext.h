@@ -32,9 +32,8 @@ namespace GXEZ
         // Drawer
         virtual IImageDrawer2D* CreateImageDrawer2D() = 0;
         virtual void            ReleaseImageDrawer2D(IImageDrawer2D* drawer) = 0;
-        // Renderer
+        // Renderer (Unique (singleton) (can be SDL, OpenGL, Vulkan, ....))
         virtual IRenderer*      GetRenderer(IWindow* window) = 0;
 
-        
     };
 }

@@ -61,8 +61,18 @@ namespace GXEZ
 		{
 			_width = width;
 			_height = height;
-			_window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-				width, height, SDL_WINDOW_RESIZABLE);
+
+			if (_context->GetType() == IGXEZContext::GRAPHIC_CONTEXT_TYPE_SDL2_RENDERER)
+			{
+				_window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+					width, height, SDL_WINDOW_RESIZABLE | SDL_RENDERER_PRESENTVSYNC);
+			}
+			else if (_context->GetType() == IGXEZContext::GRAPHIC_CONTEXT_TYPE_SDL2_DRAWER)
+			{
+				_window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+					width, height, SDL_WINDOW_RESIZABLE);
+			}
+			
 			if (this->_window == NULL)
 			{
 				std::cerr << "SDL: Unable to create window: " << SDL_GetError() << std::endl;
@@ -88,6 +98,7 @@ namespace GXEZ
 			_buffer->InitFromSurface(_screen);
 			_open = true;
 			_id = SDL_GetWindowID(_window);
+			std::cout << "SDL Window ID (" << _id << ")" << std::endl;
 
 			SDL_SetWindowBordered(_window, (SDL_bool)!_borderless);
 		}
@@ -108,7 +119,6 @@ namespace GXEZ
 			if (_buffer)
 			{
 				_screen = NULL;
-				delete (_buffer);
 				_buffer = NULL;
 			}
 			if (_renderer) {
@@ -149,8 +159,9 @@ namespace GXEZ
 
 	void WindowSDL::Refresh()
 	{
-		if (_window && !_renderer)
+		if (_window && !_renderer) {
 			SDL_UpdateWindowSurface(_window);
+		}
 	}
 
 	const unsigned int& WindowSDL::GetWidth() const
@@ -235,6 +246,7 @@ namespace GXEZ
 		// And Assign Event
 		Event::Definition	eventDef;
 
+		eventDef.state = ControlKeyState::NONE;
 		eventDef.idDevice = GetID();
 		eventDef.type = Event::Type::WINDOW;
 
@@ -252,7 +264,7 @@ namespace GXEZ
 		_linkedEventHandler->SetPriority(IEventHandler::Priority::MEDIUM);
 	}
 
-	void WindowSDL::LinkImageDrawer2D(IRenderer* renderer)
+	void WindowSDL::LinkImageDrawer2D(IImageDrawer2D* drawer)
 	{
 		// Only a drawer2D SDL is managed for the moment
 		_drawer = dynamic_cast<ImageDrawer2DSDL*>(drawer);
@@ -277,6 +289,19 @@ namespace GXEZ
 			Refresh();
 			_screen = SDL_GetWindowSurface(_window);
 			_buffer->InitFromSurface(_screen);
+			if (_renderer) {
+				SDL_Rect renderRect;
+				int windowX;
+				int windowY;
+				SDL_RenderGetViewport(_renderer, &renderRect);
+				SDL_GetWindowSize(_window, &windowX, &windowY);
+				if (renderRect.w != windowX || renderRect.h != windowY)
+				{
+					renderRect.w = windowX;
+					renderRect.h = windowY;
+					SDL_RenderSetViewport(_renderer, &renderRect);
+				}
+			}
 		}
 	}
 

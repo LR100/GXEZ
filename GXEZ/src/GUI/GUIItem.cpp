@@ -15,10 +15,10 @@ namespace GXEZ
 		_type = type;
 		_renderer = renderer;
 		_parent = NULL;
-		_realPositionX = 0;
-		_realPositionY = 0;
-		_realSizeWidth = 0;
-		_realSizeHeight = 0;
+		_realPosition.x = 0;
+		_realPosition.y = 0;
+		_realSize.x= 0;
+		_realSize.y = 0;
 		_isVisible = true;
 		_isHovered = false;
 		_isClicked = false;
@@ -33,6 +33,12 @@ namespace GXEZ
 			_id = 0;
 			_manager = NULL;
 		}
+	}
+
+	void GUIItem::Resize(const Definition::Size& size)
+	{
+		_definition.size = size;
+		OnResizeParent();
 	}
 
 	void GUIItem::Draw(IRenderer* renderer)
@@ -128,7 +134,7 @@ namespace GXEZ
 	{
 		if (_isClicked != state)
 		{
-			std::cout << "Item Clicked (" << state << ")" << std::endl;
+			// std::cout << "Item Clicked (" << state << ")" << std::endl;
 			_isClicked = state;
 			// Call Overridable Method On Click
 			OnClick(state);
@@ -177,6 +183,7 @@ namespace GXEZ
 
 	void GUIItem::ClearTextures()
 	{
+		// std::cout << "GUIItem::ClearTextures()" << std::endl;
 		for (size_t i = 0; i < _textures.size(); i += 1)
 		{
 			if (_textures.at(i) != NULL) {
@@ -186,69 +193,82 @@ namespace GXEZ
 		_textures.clear();
 	}
 
-	const int& GUIItem::GetRealPositionX() const
+	const Vec2i& GUIItem::GetRealPosition() const
 	{
-		return (_realPositionX);
+		return (_realPosition);
 	}
 
-	const int& GUIItem::GetRealPositionY() const
+	const Vec2i& GUIItem::GetRealSize() const
 	{
-		return (_realPositionY);
+		return (_realSize);
 	}
 
-	const int& GUIItem::GetRealSizeWidth() const
+	void GUIItem::OnResizeParent()
 	{
-		return (_realSizeWidth);
+		ComputeRealPosition();
+		Vec2i previousSize = GetRealSize();
+		ComputeRealSize();
+		ComputeAABB();
+		if (previousSize != GetRealSize())
+		{
+			OnSizeChanged();
+		}
+		for (size_t i = 0; i < _children.size(); i += 1)
+		{
+			_children.at(i)->OnResizeParent();
+		}
 	}
 
-	const int& GUIItem::GetRealSizeHeight() const
+	void GUIItem::OnSizeChanged()
 	{
-		return (_realSizeHeight);
+		std::cout << "GUIItem::OnSizeChanged()" << std::endl;
+		CreateTextures();
 	}
 
 	void GUIItem::ComputeRealPosition()
 	{
 		if (_definition.position.type == UnitType::ABSOLUTE_PX)
 		{
-			_realPositionX = (int)_definition.position.x;
-			_realPositionY = (int)_definition.position.y;
+			_realPosition.x = (int)_definition.position.x;
+			_realPosition.y = (int)_definition.position.y;
 		}
 		else if (_definition.position.type == UnitType::RELATIVE_TO_PARENT && _parent != NULL) {
-			_realPositionX = (int)((float)_parent->GetRealPositionX() + ((float)_parent->GetRealSizeWidth() * _definition.position.x));
-			_realPositionY = (int)((float)_parent->GetRealPositionY() + ((float)_parent->GetRealSizeHeight() * _definition.position.y));
+			_realPosition.x = (int)((float)_parent->GetRealPosition().x + ((float)_parent->GetRealSize().x* _definition.position.x));
+			_realPosition.y = (int)((float)_parent->GetRealPosition().y + ((float)_parent->GetRealSize().y * _definition.position.y));
 		}
 		else {
-			_realPositionX = 0;
-			_realPositionY = 0;
+			_realPosition.x = 0;
+			_realPosition.y = 0;
 		}
-		std::cout << "GUIItem::ComputeRealPosition() X (" << _realPositionX << ") Y (" << _realPositionY << ")" << std::endl;
+		// std::cout << "GUIItem::ComputeRealPosition() X (" << _realPosition.x << ") Y (" << _realPosition.y << ")" << std::endl;
 	}
 
 	void GUIItem::ComputeRealSize()
 	{
 		if (_definition.size.type == UnitType::ABSOLUTE_PX)
 		{
-			_realSizeWidth = (int)_definition.size.width;
-			_realSizeHeight = (int)_definition.size.height;
+			_realSize.x = (int)_definition.size.width;
+			_realSize.y = (int)_definition.size.height;
 		}
 		else if (_definition.size.type == UnitType::RELATIVE_TO_PARENT && _parent != NULL) {
-			_realSizeWidth = (int)((float)_parent->GetRealSizeWidth() * _definition.size.width);
-			_realSizeHeight = (int)((float)_parent->GetRealSizeHeight() * _definition.size.height);
+			_realSize.x = (int)((float)_parent->GetRealSize().x * _definition.size.width);
+			_realSize.y = (int)((float)_parent->GetRealSize().y * _definition.size.height);
 		}
 		else {
-			_realSizeWidth = 0;
-			_realSizeHeight = 0;
+			_realSize.x = 0;
+			_realSize.y = 0;
 		}
-		std::cout << "GUIItem::ComputeRealSize() W (" << _realSizeWidth << ") H (" << _realSizeHeight << ")" << std::endl;
+		// std::cout << "GUIItem::ComputeRealSize() W (" << _realSize.x << ") H (" << _realSize.y << ")" << std::endl;
 	}
 
 	void GUIItem::ComputeAABB()
 	{
-		_aabb.halfSize.x = (_realSizeWidth / 2);
-		_aabb.halfSize.y = (_realSizeHeight / 2);
-		_aabb.center.x = _aabb.halfSize.x + _realPositionX;
-		_aabb.center.y = _aabb.halfSize.y + _realPositionY;
+		_aabb.halfSize.x = (_realSize.x / 2);
+		_aabb.halfSize.y = (_realSize.y / 2);
+		_aabb.center.x = _aabb.halfSize.x + _realPosition.x;
+		_aabb.center.y = _aabb.halfSize.y + _realPosition.y;
 		_aabb.ComputeMinMax();
+		// TODO: Relocate In AABB Quadtree
 	}
 
 	GUIButton::GUIButton(GUIManager* manager, GUIItem* parent, IRenderer* renderer, const GUIButton::Definition& definition) : GUIItem(manager, parent, renderer, GUIItem::ItemType::BUTTON, definition)
@@ -275,39 +295,38 @@ namespace GXEZ
 		CreateTextureClicked();
 	}
 
-	ATexture* GUIButton::CreateTextureBase(const GUIItem::Definition::Border& border, const GUIItem::Definition::Background& background)
+	ATexture2D* GUIButton::CreateTextureBase(const GUIItem::Definition::Border& border, const GUIItem::Definition::Background& background)
 	{
-		ATexture* sprite;
-
-		std::stringstream	ss;
-		ss << GetID();
-		ss << "buttonSB";
 		// Create Image & USE it
-		IImage* imageBuffer = _renderer->CreateImage(ss.str(), GetRealSizeWidth(), GetRealSizeHeight());
-		_renderer->UseImage(ss.str());
+		ATexture2D* texture = _renderer->CreateTexture2D(ATexture2D::Definition(GetRealSize()));
+		texture->UseAsRenderTarget();
 
 		////// DRAW //////
-		// Button Borders
-		IImageDrawer2D::RectBorder rectBorder;
+		Vec2i pos;
 
-		rectBorder.width = GetRealSizeWidth();
-		rectBorder.height = GetRealSizeHeight();
+		// Button Borders
+		IDrawer2D::RectBorder rectBorder;
+
+		rectBorder.width = GetRealSize().x;
+		rectBorder.height = GetRealSize().y;
 		rectBorder.color = border.color;
 		rectBorder.size = border.size; // Convert Needed from UnitType
 		rectBorder.radius = border.radius;
-		std::cout << "GUIButton::CreateTextureBase Border Radius (" << border.radius << ")" << std::endl;
+		// std::cout << "GUIButton::CreateTextureBase Border Radius (" << border.radius << ")" << std::endl;
 
-		_renderer->DrawRectBorder(0, 0, rectBorder);
+		texture->DrawRectBorder(pos, rectBorder);
 
 		// BackGround
-		IImageDrawer2D::Rect rect;
+		IDrawer2D::Rect rect;
 
-		rect.width = (GetRealSizeWidth() - (border.size * 2));
-		rect.height = (GetRealSizeHeight() - (border.size * 2));
+		rect.width = (GetRealSize().x - (border.size * 2));
+		rect.height = (GetRealSize().y - (border.size * 2));
 		rect.color = background.color;
 		rect.radius = border.radius;
+		pos.x = int(border.size);
+		pos.y = pos.x;
 
-		_renderer->DrawRect(int(border.size), int(border.size), rect);
+		texture->DrawRect(pos, rect);
 
 		///// CIRCLE TEST /////
 
@@ -333,14 +352,13 @@ namespace GXEZ
 		//circle.part = IImageDrawer2D::Circle::Part::BOTTOM_RIGHT;
 		//_renderer->DrawCircle(pc.x, pc.y, circle);
 
-		imageBuffer->Export("test");
+		// imageBuffer->Export("test");
 
-		ColorDef	colorDefTransparency;
-		sprite = new Texture(imageBuffer, colorDefTransparency);
-		// Remove Image
-		_renderer->RemoveImage(ss.str());
+		// ColorDef	colorDefTransparency;
+		//sprite = new Texture(imageBuffer, colorDefTransparency);
+		
 
-		return (sprite);
+		return (texture);
 	}
 
 	void GUIButton::CreateTextureNormal()
@@ -360,18 +378,18 @@ namespace GXEZ
 
 	void GUIButton::OnDraw(IRenderer* renderer)
 	{
-		//std::cout << "GUIButton::Draw()" << std::endl;
+		// std::cout << "GUIButton::Draw()" << std::endl;
 		if (IsClicked())
 		{ // Draw Cliked Texture
-			renderer->DrawTexture(GetRealPositionX(), GetRealPositionY(), _textures.at(2));
+			renderer->DrawTexture(GetRealPosition(), _textures.at(2));
 		}
 		else if (IsHovered())
 		{ // Draw Hovered Texture
-			renderer->DrawTexture(GetRealPositionX(), GetRealPositionY(), _textures.at(1));
+			renderer->DrawTexture(GetRealPosition(), _textures.at(1));
 		}
 		else
 		{ // Draw Normal Texture
-			renderer->DrawTexture(GetRealPositionX(), GetRealPositionY(), _textures.at(0));
+			renderer->DrawTexture(GetRealPosition(), _textures.at(0));
 		}
 	}
 

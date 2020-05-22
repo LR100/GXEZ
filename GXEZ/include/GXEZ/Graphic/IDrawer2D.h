@@ -89,12 +89,12 @@ namespace GXEZ
 		// Line
 		virtual void					DrawLine(const Vec2i& a, const Vec2i& b, const Color& color) = 0;
 		// Rect
-		virtual void					DrawRectBorder(const Vec2i& pos, const RectBorder& borderdef) = 0;
-		virtual void					DrawRect(const Vec2i& pos, const Rect& rect) = 0;
+		virtual void					DrawRectBorder(const Vec2i& pos, const IDrawer2D::RectBorder& borderdef) = 0;
+		virtual void					DrawRect(const Vec2i& pos, const IDrawer2D::Rect& rect) = 0;
 		// Circle
-		virtual void					DrawCircle(const Vec2i& pos, const Circle& circle) = 0;
+		virtual void					DrawCircle(const Vec2i& pos, const IDrawer2D::Circle& circle) = 0;
 		// Text
-		virtual void					DrawText(const Vec2i& pos, const Text& text) = 0;
+		virtual void					DrawText(const Vec2i& pos, const IDrawer2D::Text& text) = 0;
 	};
 }
 
