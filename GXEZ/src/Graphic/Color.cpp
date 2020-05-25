@@ -11,7 +11,7 @@ namespace GXEZ
 
 	Color::Color()
 	{
-		_init(0, 0, 0, 0, ColorFactory::Get().GetFormat());
+		_init(0, 0, 0, 255, ColorFactory::Get().GetFormat());
 	}
 
 	Color::Color(const ColorDef& def)
@@ -32,12 +32,12 @@ namespace GXEZ
 
 	Color::Color(const ColorFormat& format)
 	{
-		_init(0, 0, 0, 0, format);
+		_init(0, 0, 0, 255, format);
 	}
 
 	Color::Color(const unsigned char& r, const unsigned char& g, const unsigned char& b)
 	{
-		_init(r, g, b, 0, ColorFactory::Get().GetFormat());
+		_init(r, g, b, 255, ColorFactory::Get().GetFormat());
 	}
 
 	Color::Color(const unsigned char& r, const unsigned char& g, const unsigned char& b, const unsigned char& a)
@@ -47,7 +47,7 @@ namespace GXEZ
 
 	Color::Color(const unsigned char& r, const unsigned char& g, const unsigned char& b, const ColorFormat& format)
 	{
-		_init(r, g, b, 0, format);
+		_init(r, g, b, 255, format);
 	}
 
 	Color::Color(const unsigned char& r, const unsigned char& g, const unsigned char& b, const unsigned char& a, const ColorFormat& format)
@@ -118,31 +118,31 @@ namespace GXEZ
 	void Color::_initFromName(const ColorName& name)
 	{
 		if (name == ColorName::RED) {
-			_init(255, 0, 0, 0, _format);
+			_init(255, 0, 0, 255, _format);
 		}
 		else if (name == ColorName::WHITE) {
-			_init(255, 255, 255, 0, _format);
+			_init(255, 255, 255, 255, _format);
 		}
 		else if (name == ColorName::GREY) {
-			_init(120, 120, 120, 0, _format);
+			_init(120, 120, 120, 255, _format);
 		}
 		else if (name == ColorName::GREEN) {
-			_init(0, 255, 0, 0, _format);
+			_init(0, 255, 0, 255, _format);
 		}
 		else if (name == ColorName::BLUE) {
-			_init(0, 0, 255, 0, _format);
+			_init(0, 0, 255, 255, _format);
 		}
 		else if (name == ColorName::ORANGE) {
-			_init(255, 165, 0, 0, _format);
+			_init(255, 165, 0, 255, _format);
 		}
 		else if (name == ColorName::YELLOW) {
-			_init(255, 255, 0, 0, _format);
+			_init(255, 255, 0, 255, _format);
 		}
 		else if (name == ColorName::PURPLE) {
-			_init(130, 0, 130, 0, _format);
+			_init(130, 0, 130, 255, _format);
 		}
 		else {
-			_init(0, 0, 0, 0, _format); // BLACK
+			_init(0, 0, 0, 255, _format); // BLACK
 		}
 	}
 
@@ -249,7 +249,7 @@ namespace GXEZ
 
 	Color ColorFactory::Create()
 	{
-		return (Color(0, 0, 0, 0, _format));
+		return (Color(0, 0, 0, 255, _format));
 	}
 
 	Color ColorFactory::Create(const unsigned char& r, const unsigned char& g, const unsigned char& b, const unsigned char& a)

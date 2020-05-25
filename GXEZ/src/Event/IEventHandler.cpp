@@ -5,6 +5,10 @@ namespace GXEZ
 	IEventHandler::IEventHandler()
 	{
 		_curPriority = Priority::MEDIUM;
+		_handlers[Priority::PERMANENT] = std::unordered_map<EVENT_TYPE_HASH_, WorkList>();
+		_handlers[Priority::HIGH] = std::unordered_map<EVENT_TYPE_HASH_, WorkList>();
+		_handlers[Priority::MEDIUM] = std::unordered_map<EVENT_TYPE_HASH_, WorkList>();
+		_handlers[Priority::LOW] = std::unordered_map<EVENT_TYPE_HASH_, WorkList>();
 	}
 
 	void IEventHandler::TriggerEvent(ControlKey key)
@@ -37,8 +41,11 @@ namespace GXEZ
 
 	void IEventHandler::Clear()
 	{
-		_handlers.clear();
-		_handlers = _handlersPermanent; 
+		_handlersIt = _handlers.begin();
+		_handlersIt++; // Clear Everything except PERMANENT
+		_handlersItEnd = _handlers.end();
+		for (; _handlersIt != _handlersItEnd; _handlersIt++)
+			_handlersIt->second.clear();
 	}
 
 	const Mouse* IEventHandler::GetMouse() const
@@ -50,15 +57,22 @@ namespace GXEZ
 
 	void IEventHandler::HandleEvent(EVENT_TYPE_HASH_ idevent)
 	{
-		if (_handlers.count(idevent))
+		_handlersIt = _handlers.begin();
+		_handlersItEnd = _handlers.end();
+		// std::cout << "Handle Event Start (" << _handlersIt->first << ")" << std::endl;
+		for (; _handlersIt != _handlersItEnd; _handlersIt++)
 		{
-			WorkList* workList = &_handlers.at(idevent);
-			// Do Work
-			// std::cout << "WorkList Size (" << workList->_works.size() << ")" << std::endl;
-			for (size_t i = 0; i < workList->_works.size(); i += 1)
+			// std::cout << "Handle Event (" << _handlersIt->first << ")" << std::endl;
+			if (_handlersIt->second.count(idevent))
 			{
-				// std::cout << "HandleEvent (" << idevent << ")" << std::endl;
-				workList->_works.at(i)._function();
+				// Do Work Permanent First
+				WorkList* workList = &_handlersIt->second.at(idevent);
+				// std::cout << "WorkList Size (" << workList->_works.size() << ")" << std::endl;
+				for (size_t i = 0; i < workList->_works.size(); i += 1)
+				{
+					// std::cout << "HandleEvent (" << idevent << ")" << std::endl;
+					workList->_works.at(i)._function();
+				}
 			}
 		}
 	}

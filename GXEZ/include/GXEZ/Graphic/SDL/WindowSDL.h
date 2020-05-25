@@ -64,6 +64,7 @@ namespace GXEZ
 
 		// Event Handler
 		virtual void				LinkEventHandler(IEventHandler* eventHandler) override;
+		virtual IEventHandler*		GetEventHandler() override;
 		// Drawer
 		virtual void				LinkImageDrawer2D(IImageDrawer2D* drawer) override;
 		virtual void				UseImageDrawer2D() override;
@@ -81,6 +82,8 @@ namespace GXEZ
 		void				InitBasics(GXEZContextSDL* context);
 
 		// Event Handlers
+		virtual void		LinkEventFunction(ControlKey evt, std::function<void()> function);
+
 		void				EventResize();
 		void				EventClose();
 		void				EventFocus();
@@ -90,6 +93,7 @@ namespace GXEZ
 		bool			_showCursor;
 		bool			_focus;
 		bool			_borderless;
+		bool			_fullscreen;
 
 		unsigned int	_width, _height;
 
@@ -98,16 +102,17 @@ namespace GXEZ
 		SDL_Window*		_window;
 		SDL_Rect		_rect;
 		SDL_Surface*	_screen;
+		SDL_Renderer*	_renderer;
 		// GXEZ
 		uint32_t		_id;
 		ColorFormat		_format;
 		ImageSDL*		_buffer;
 
-		IEventHandler*	_linkedEventHandler;
+		IEventHandler*	_eventHandler;
 
 		ImageDrawer2DSDL*	_drawer;
 
-		SDL_Renderer*	_renderer;
+		
 
 		GXEZContextSDL* _context;
 	};

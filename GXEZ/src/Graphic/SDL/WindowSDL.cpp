@@ -37,12 +37,13 @@ namespace GXEZ
 		_renderer = NULL;
 		_drawer = NULL;
 		_context = context;
-		_linkedEventHandler = NULL;
+		_eventHandler = NULL;
 		_window = NULL;
 		_open = false;
 		_id = 0;
 		_showCursor = true;
 		_borderless = false;
+		_fullscreen = false;
 	}
 
 	bool WindowSDL::Open(IEventHandler* eHandler, unsigned int width, unsigned int height, const std::string& name)
@@ -72,7 +73,7 @@ namespace GXEZ
 				_window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 					width, height, SDL_WINDOW_RESIZABLE);
 			}
-			
+
 			if (this->_window == NULL)
 			{
 				std::cerr << "SDL: Unable to create window: " << SDL_GetError() << std::endl;
@@ -196,7 +197,11 @@ namespace GXEZ
 
 	SDL_Renderer* WindowSDL::GetSDLRenderer() const
 	{
-		return (_renderer);
+		if (_focus) // Return SDL Renderer only if conditions are needed
+		{
+			return (_renderer);
+		}
+		return (NULL);
 	}
 
 	const uint32_t& WindowSDL::GetID() const
@@ -206,23 +211,38 @@ namespace GXEZ
 
 	void WindowSDL::SetBorderless(bool state)
 	{
-		_borderless = state;
-		if (_window)
-			SDL_SetWindowBordered(_window, (SDL_bool)!_borderless);
+		if (_borderless != state)
+		{
+			_borderless = state;
+			if (_window)
+				SDL_SetWindowBordered(_window, (SDL_bool)!_borderless);
+		}
 	}
 
 	bool WindowSDL::IsBorderless() const
 	{
-		return false;
+		return (_borderless);
 	}
 
 	void WindowSDL::SetFullScreen(bool state)
 	{
+		if (_fullscreen != state)
+		{
+			_fullscreen = state;
+			if (_fullscreen)
+			{
+				SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN);
+			}
+			else
+			{
+				SDL_SetWindowFullscreen(_window, 0);
+			}
+		}
 	}
 
 	bool WindowSDL::IsFullScreen() const
 	{
-		return false;
+		return (_fullscreen);
 	}
 
 	void WindowSDL::CursorHide(bool state)
@@ -242,7 +262,7 @@ namespace GXEZ
 		}
 		// Remove From Old IeventHandler if present one
 		// Then Set New One
-		_linkedEventHandler = eventHandler;
+		_eventHandler = eventHandler;
 		// And Assign Event
 		Event::Definition	eventDef;
 
@@ -250,18 +270,23 @@ namespace GXEZ
 		eventDef.idDevice = GetID();
 		eventDef.type = Event::Type::WINDOW;
 
-		_linkedEventHandler->SetPriority(IEventHandler::Priority::PERMANENT);
+		_eventHandler->SetPriority(IEventHandler::Priority::PERMANENT);
 
 		eventDef.key = ControlKey::WINDOW_CLOSE;
-		_linkedEventHandler->AddHandlerToEvent(eventDef, &WindowSDL::EventClose, this);
+		_eventHandler->AddHandlerToEvent(eventDef, &WindowSDL::EventClose, this);
 		eventDef.key = ControlKey::WINDOW_RESIZE;
-		_linkedEventHandler->AddHandlerToEvent(eventDef, &WindowSDL::EventResize, this);
+		_eventHandler->AddHandlerToEvent(eventDef, &WindowSDL::EventResize, this);
 		eventDef.key = ControlKey::WINDOW_FOCUS;
-		_linkedEventHandler->AddHandlerToEvent(eventDef, &WindowSDL::EventFocus, this);
+		_eventHandler->AddHandlerToEvent(eventDef, &WindowSDL::EventFocus, this);
 		eventDef.key = ControlKey::WINDOW_UNFOCUS;
-		_linkedEventHandler->AddHandlerToEvent(eventDef, &WindowSDL::EventUnFocus, this);
+		_eventHandler->AddHandlerToEvent(eventDef, &WindowSDL::EventUnFocus, this);
 
-		_linkedEventHandler->SetPriority(IEventHandler::Priority::MEDIUM);
+		_eventHandler->SetPriority(IEventHandler::Priority::MEDIUM);
+	}
+
+	IEventHandler* WindowSDL::GetEventHandler()
+	{
+		return (_eventHandler);
 	}
 
 	void WindowSDL::LinkImageDrawer2D(IImageDrawer2D* drawer)
@@ -274,6 +299,21 @@ namespace GXEZ
 	{
 		if (_drawer) {
 			_drawer->SetCurrentImage(GetSDLBackBuffer());
+		}
+	}
+
+	void WindowSDL::LinkEventFunction(ControlKey evt, std::function<void()> function)
+	{
+		if (evt > ControlKey::WINDOW_NONE && evt < ControlKey::WINDOW_LAST)
+		{
+			Event::Definition	eventDef;
+			eventDef.state = ControlKeyState::NONE;
+			eventDef.idDevice = GetID();
+			eventDef.type = Event::Type::WINDOW;
+			// Medium Priority
+			_eventHandler->SetPriority(IEventHandler::Priority::MEDIUM);
+			eventDef.key = evt;
+			_eventHandler->AddHandlerToEvent(eventDef, function);
 		}
 	}
 
@@ -313,14 +353,16 @@ namespace GXEZ
 
 	void WindowSDL::EventFocus()
 	{
+		std::cout << "WindowSDL::EventFocus" << std::endl;
 		_focus = true;
 		SDL_ShowCursor(_showCursor); // Set Cursor Mode
 	}
 
 	void WindowSDL::EventUnFocus()
 	{
+		std::cout << "WindowSDL::EventUnFocus" << std::endl;
 		_focus = false;
-		SDL_ShowCursor(true); // Set Cursor Mode
+		SDL_ShowCursor(true); // Force cursor visibility
 	}
 
 }

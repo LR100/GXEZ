@@ -14,7 +14,7 @@ namespace GXEZ
 
 	ImageDrawer2DSDL* ImageDrawer2DSDL::sptr = NULL;    //initialize Singleton pointer to NULL
 
-	ImageDrawer2DSDL::ImageDrawer2DSDL(GXEZContextSDL* context, const ColorFormat& format) : _dCBr(this), _dRB(this), _dR(this)
+	ImageDrawer2DSDL::ImageDrawer2DSDL(GXEZContextSDL* context, const ColorFormat& format)
 	{
 		_context = context;
 		_defaultImage = NULL;
@@ -269,7 +269,12 @@ namespace GXEZ
 		DrawLine(a.x, a.y, b.x, b.y, color);
 	}
 
-	void ImageDrawer2DSDL::DrawRectBorder(const Vec2i& pos, const RectBorder& borderdef)
+	/*void ImageDrawer2DSDL::DrawRect(const Vec2i& pos, const Rect& rect)
+	{
+		DrawRect(pos.x, pos.y, rect);
+	}*/
+
+	/*void ImageDrawer2DSDL::DrawRectBorder(const Vec2i& pos, const RectBorder& borderdef)
 	{
 		DrawRectBorder(pos.x, pos.y, borderdef);
 	}
@@ -277,11 +282,11 @@ namespace GXEZ
 	void ImageDrawer2DSDL::DrawRect(const Vec2i& pos, const Rect& rect)
 	{
 		DrawRect(pos.x, pos.y, rect);
-	}
+	}*/
 
-	void ImageDrawer2DSDL::DrawCircle(const Vec2i& pos, const Circle& circle)
+	/*void ImageDrawer2DSDL::DrawCircle(const Vec2i& pos, const Circle& circle)
 	{
-	}
+	}*/
 
 	void ImageDrawer2DSDL::DrawText(const Vec2i& pos, const Text& text)
 	{
@@ -442,29 +447,15 @@ namespace GXEZ
 		}
 	}
 
-
 	void ImageDrawer2DSDL::DrawRectBorder(const int& x, const int& y, const RectBorder& border)
 	{
-		// std::cout << "Draw Rect Border at (" << x << ") (" << y << ") Size (" << border.height << ") (" << border.width << ")" << std::endl;
-		if (!_currImage)
-			return;
-		_dRB.Draw(x, y, border);
+		//ADrawer2DExtended::DrawRectBorder(Vec2i(x, y), border);
 	}
-
-	/////////////////////////////////
-	///////////////
-	///
-	///
-	// 
 
 	void ImageDrawer2DSDL::DrawRect(const int& x, const int& y, const Rect& rect)
 	{
-		// std::cout << "Draw Rect  at (" << x << ") (" << y << ") Size (" << rect.height << ") (" << rect.width << ")" << std::endl;
-		if (!_currImage)
-			return;
-		_dR.Draw(x, y, rect);
+		//ADrawer2DExtended::DrawRect(Vec2i(x, y), rect);
 	}
-
 
 	void ImageDrawer2DSDL::DrawRectFill(const int& x, const int& y, const unsigned int& width, const unsigned int& height, float fillscale, const Color& color)
 	{
@@ -694,9 +685,7 @@ namespace GXEZ
 
 	void ImageDrawer2DSDL::DrawCircle(const int& x, const int& y, const Circle& circle)
 	{
-		if (!_currImage)
-			return;
-		_dCBr.Draw(x, y, circle);
+		// ADrawer2DExtended::DrawCircle(Vec2i(x, y), circle);
 	}
 
 	//void ImageDrawer2DSDL::DrawPolygon(const unsigned int & xPos, const unsigned int & yPos, const std::vector<Vec2>& points, const Color & color)
@@ -1008,6 +997,24 @@ namespace GXEZ
 		}
 	}
 
+	void ImageDrawer2DSDL::InternDrawPoint(const Vec2i& pos, const Color& color)
+	{
+		InternCheckBFSetPixel(pos.x, pos.y, color.value());
+	}
+
+	void ImageDrawer2DSDL::InternDrawLine(const Vec2i& a, const Vec2i& b, const Color& color)
+	{
+		DrawLine(a.x, a.y, b.x, b.y, color, color);
+	}
+
+	void ImageDrawer2DSDL::InternDrawRectBorder(const Vec2i& pos, const IDrawer2D::RectBorder& borderdef)
+	{
+	}
+
+	void ImageDrawer2DSDL::InternDrawRect(const Vec2i& pos, const IDrawer2D::Rect& rect)
+	{
+	}
+
 	void ImageDrawer2DSDL::AddImage(const std::string& name, ImageSDL* img)
 	{
 		_images[name] = img;
@@ -1132,369 +1139,6 @@ namespace GXEZ
 			rectToFill = ((height * fillScale) + 1.0f);
 		else
 			rectToFill = ((width * fillScale) + 1.0f);
-	}
-
-	//////////////////////////////
-	/////                  ///////
-	/////      CIRCLES     ///////
-	/////                  ///////
-	//////////////////////////////
-
-	ImageDrawer2DSDL::DrawerCircleBressenham::DrawerCircleBressenham(ImageDrawer2DSDL* drawer)
-	{
-		_drawFct = NULL;
-		_drawer = drawer;
-		// Vec2i are init on 0
-		r = 1;
-		x = 0;
-		y = r;
-		d = 0;
-	}
-
-	void ImageDrawer2DSDL::DrawerCircleBressenham::Draw(const int& _x, const int& _y, const Circle& circle)
-	{
-		SetPartsPosition(Vec2i(_x, _y), Circle::Part::FULL);
-		Draw(circle);
-	}
-
-	void ImageDrawer2DSDL::DrawerCircleBressenham::Draw(const Circle& circle)
-	{
-		_circle = circle;
-		for (t = 0; t < _circle.thickness; t += 1)
-		{
-			r = int((float)_circle.diameter * 0.5f);
-			x = 0;
-			y = r;
-			d = 3 - 2 * r;
-			if (circle.part == IImageDrawer2D::Circle::Part::FULL) {
-				_drawFct = &ImageDrawer2DSDL::DrawerCircleBressenham::DrawFull;
-			}
-			else if (circle.part == IImageDrawer2D::Circle::Part::TOP) {
-				_drawFct = &ImageDrawer2DSDL::DrawerCircleBressenham::DrawTop;
-			}
-			else if (circle.part == IImageDrawer2D::Circle::Part::TOP_LEFT) {
-				_drawFct = &ImageDrawer2DSDL::DrawerCircleBressenham::DrawTopLeft;
-			}
-			else if (circle.part == IImageDrawer2D::Circle::Part::TOP_RIGHT) {
-				_drawFct = &ImageDrawer2DSDL::DrawerCircleBressenham::DrawTopRight;
-			}
-			else if (circle.part == IImageDrawer2D::Circle::Part::BOTTOM) {
-				_drawFct = &ImageDrawer2DSDL::DrawerCircleBressenham::DrawBottom;
-			}
-			else if (circle.part == IImageDrawer2D::Circle::Part::BOTTOM_LEFT) {
-				_drawFct = &ImageDrawer2DSDL::DrawerCircleBressenham::DrawBottomLeft;
-			}
-			else if (circle.part == IImageDrawer2D::Circle::Part::BOTTOM_RIGHT) {
-				_drawFct = &ImageDrawer2DSDL::DrawerCircleBressenham::DrawBottomRight;
-			}
-			if (_drawFct) {
-				// Start To Draw
-				(this->*_drawFct)();
-				while (y >= x)
-				{
-					// for each pixel we will 
-					// draw all eight pixels 
-
-					x++;
-
-					// check for decision parameter 
-					// and correspondingly  
-					// update d, x, y 
-					if (d > 0)
-					{
-						y--;
-						d = d + 4 * (x - y) + 10;
-					}
-					else {
-						d = d + 4 * x + 6;
-					}
-					(this->*_drawFct)();
-				}
-			}
-			_circle.diameter += 2;
-		}
-	}
-
-	void ImageDrawer2DSDL::DrawerCircleBressenham::SetPartsPosition(const Vec2i& pos, const Circle::Part& part)
-	{
-		if (part == Circle::Part::FULL) {
-			pBL = pos;
-			pBR = pos;
-			pTL = pos;
-			pTR = pos;
-		}
-		else if (part == Circle::Part::BOTTOM_LEFT) {
-			pBL = pos;
-		}
-		else if (part == Circle::Part::BOTTOM_RIGHT) {
-			pBR = pos;
-		}
-		else if (part == Circle::Part::BOTTOM) {
-			pBL = pos;
-			pBR = pos;
-		}
-		else if (part == Circle::Part::TOP_LEFT) {
-			pTL = pos;
-		}
-		else if (part == Circle::Part::TOP_RIGHT) {
-			pTR = pos;
-		}
-		else if (part == Circle::Part::TOP) {
-			pTL = pos;
-			pTR = pos;
-		}
-	}
-
-	void ImageDrawer2DSDL::DrawerCircleBressenham::DrawFull()
-	{
-		DrawTop();
-		DrawBottom();
-	}
-
-	void ImageDrawer2DSDL::DrawerCircleBressenham::DrawTop()
-	{
-		DrawTopLeft();
-		DrawTopRight();
-	}
-
-	void ImageDrawer2DSDL::DrawerCircleBressenham::DrawTopLeft()
-	{
-		_drawer->InternCheckBFSetPixel(pTL.x - y, pTL.y - x, _circle.color.value());
-		_drawer->InternCheckBFSetPixel(pTL.x - x, pTL.y - y, _circle.color.value());
-	}
-
-	void ImageDrawer2DSDL::DrawerCircleBressenham::DrawTopRight()
-	{
-		_drawer->InternCheckBFSetPixel(pTR.x + x, pTR.y - y, _circle.color.value());
-		_drawer->InternCheckBFSetPixel(pTR.x + y, pTR.y - x, _circle.color.value());
-	}
-
-	void ImageDrawer2DSDL::DrawerCircleBressenham::DrawBottom()
-	{
-		DrawBottomLeft();
-		DrawBottomRight();
-	}
-
-	void ImageDrawer2DSDL::DrawerCircleBressenham::DrawBottomLeft()
-	{
-		_drawer->InternCheckBFSetPixel(pBL.x - x, pBL.y + y, _circle.color.value());
-		_drawer->InternCheckBFSetPixel(pBL.x - y, pBL.y + x, _circle.color.value());
-	}
-
-	void ImageDrawer2DSDL::DrawerCircleBressenham::DrawBottomRight()
-	{
-		_drawer->InternCheckBFSetPixel(pBR.x + y, pBR.y + x, _circle.color.value());
-		_drawer->InternCheckBFSetPixel(pBR.x + x, pBR.y + y, _circle.color.value());
-	}
-
-	//////////////////////////////
-	/////                  ///////
-	///// RECT and BORDERS ///////
-	/////                  ///////
-	//////////////////////////////
-
-	ImageDrawer2DSDL::IDrawerRect::IDrawerRect(ImageDrawer2DSDL* drawer)
-	{
-		_drawer = drawer;
-	}
-
-	void ImageDrawer2DSDL::IDrawerRect::DrawStart(const int& _x, const int& _y, Rect& rect)
-	{
-		DrawInit(_x, _y, rect);
-		// Use corresponding method to type of rect)
-		if (rect.radius == 0) {
-			DrawClassic();
-		}
-		else {
-			DrawRadius();
-		}
-	}
-
-	// Can Modify rect
-	bool ImageDrawer2DSDL::IDrawerRect::DrawInit(const int& _x, const int& _y, Rect& rect)
-	{
-		xr = _x;
-		yr = _y;
-		// Init Rect and check if (at least partly) inside image
-		if (!_iR.Init(xr, yr, _drawer->_currImage->GetWidth(), _drawer->_currImage->GetHeight(), rect.width, rect.height))
-			return (false);
-		// Correct The Border Radius to avoid being larger than the size of the border
-		if ((rect.radius * 2) > rect.height) {
-			rect.radius = (rect.height / 2);
-		}
-		if ((rect.radius * 2) > rect.width) {
-			rect.radius = (rect.width / 2);
-		}
-		return (OnDrawInit());
-	}
-
-
-	void ImageDrawer2DSDL::DrawerRect::Draw(const int& _x, const int& _y, const Rect& rect)
-	{
-		_rect = rect;
-		DrawStart(_x, _y, _rect);
-	}
-
-	void ImageDrawer2DSDL::DrawerRect::DrawClassic()
-	{
-		//std::cout << "DrawerRect::DrawClassic()" << std::endl;
-		for (_iR.xi = _iR.cX; _iR.xi < _iR.cXMax; _iR.xi++)
-			for (_iR.yi = _iR.cY; _iR.yi < _iR.cYMax; _iR.yi++) {
-				_drawer->InternCheckBFSetPixel(_iR.xi, _iR.yi, _rect.color.value());
-			}
-	}
-
-	void ImageDrawer2DSDL::DrawerRect::DrawRadius()
-	{
-		//std::cout << "DrawerRect::DrawRadius()" << std::endl;
-		float diameter = (float)_rect.radius * 2.0f;
-		// Border Part
-		InfoCircleBressenham c;
-		c.Init(diameter);
-		while (c.y >= c.x)
-		{
-			// for each pixel we will 
-			// draw all eight pixels 
-			c.x++;
-			// check for decision parameter 
-			// and correspondingly  
-			// update d, x, y 
-			if (c.d > 0)
-			{
-				c.y--;
-				c.d = c.d + 4 * (c.x - c.y) + 10;
-			}
-			else {
-				c.d = c.d + 4 * c.x + 6;
-			}
-
-		}
-	}
-
-	void ImageDrawer2DSDL::DrawerRectBorder::Draw(const int& _x, const int& _y, const RectBorder& rectBorder)
-	{
-		_rectBorder = rectBorder;
-		DrawStart(_x, _y, _rectBorder);
-	}
-
-	void ImageDrawer2DSDL::DrawerRectBorder::DrawClassic()
-	{
-		//std::cout << "DrawerRectBorder::DrawClassic()" << std::endl;
-		if (yr >= 0)
-			for (_iR.xi = _iR.cX; _iR.xi < _iR.cXMax; _iR.xi++)
-				_drawer->InternCheckBFSetPixel(_iR.xi, yr, _rectBorder.color.value());
-		if (xr >= 0)
-			for (_iR.yi = _iR.cY; _iR.yi < _iR.cYMax; _iR.yi++)
-				_drawer->InternCheckBFSetPixel(xr, _iR.yi, _rectBorder.color.value());
-		// Remove One to max to avoid declaring other var or 
-		_iR.cXMax -= 1;
-		_iR.cYMax -= 1;
-		_iR.xMax -= 1;
-		_iR.yMax -= 1;
-		// std::cout << "IRcXMAX (" << cXMax << ") IRcYMAX (" << cYMax << ")" << std::endl;
-		if (_iR.yMax < _iR.ih)
-			for (_iR.xi = _iR.cX; _iR.xi <= _iR.cXMax; _iR.xi++)
-				_drawer->InternCheckBFSetPixel(_iR.xi, _iR.yMax, _rectBorder.color.value());
-		if (_iR.xMax < _iR.iw)
-			for (_iR.yi = _iR.cY; _iR.yi <= _iR.cYMax; _iR.yi++)
-				_drawer->InternCheckBFSetPixel(_iR.xMax, _iR.yi, _rectBorder.color.value());
-	}
-
-	void ImageDrawer2DSDL::DrawerRectBorder::DrawRadius()
-	{
-		//std::cout << "DrawerRectBorder::DrawRadius()" << std::endl;
-		int iradius = (int)_rectBorder.radius;
-
-		// Draw Lines 
-		_iR.cX += iradius;
-		_iR.cXMax -= iradius;
-		if (yr >= 0)
-			for (_iR.xi = _iR.cX; _iR.xi < _iR.cXMax; _iR.xi++)
-				_drawer->InternCheckBFSetPixel(_iR.xi, yr, _rectBorder.color.value());
-
-		_iR.cY += iradius;
-		_iR.cYMax -= iradius;
-		if (xr >= 0)
-			for (_iR.yi = _iR.cY; _iR.yi < _iR.cYMax; _iR.yi++)
-				_drawer->InternCheckBFSetPixel(xr, _iR.yi, _rectBorder.color.value());
-
-		//// Remove One to max to avoid declaring other var or 
-
-		//cX -= 2;
-		//cXMax += 2;
-		//cY -= 2;
-		//cYMax += 2;
-		//xMax -= 1;
-		//yMax -= 1;
-
-		_iR.cXMax -= 1;
-		_iR.cYMax -= 1;
-		_iR.xMax -= 1;
-		_iR.yMax -= 1;
-		//// std::cout << "IRcXMAX (" << cXMax << ") IRcYMAX (" << cYMax << ")" << std::endl;
-
-		if (_iR.yMax < _iR.ih) // Bottom
-			for (_iR.xi = _iR.cX; _iR.xi <= _iR.cXMax; _iR.xi++)
-				_drawer->InternCheckBFSetPixel(_iR.xi, _iR.yMax, _rectBorder.color.value());
-
-		if (_iR.xMax < _iR.iw) // Right
-			for (_iR.yi = _iR.cY; _iR.yi <= _iR.cYMax; _iR.yi++)
-				_drawer->InternCheckBFSetPixel(_iR.xMax, _iR.yi, _rectBorder.color.value());
-
-		// Use Drawer Circle for Borders
-		DrawerCircleBressenham	drawerBorderCircle(_drawer);
-		Circle					borderCircle;
-
-		borderCircle.diameter = (_rectBorder.radius * 2);
-		borderCircle.color = _rectBorder.color;
-		borderCircle.part = IImageDrawer2D::Circle::Part::FULL;
-
-		drawerBorderCircle.SetPartsPosition(Vec2i(xr + iradius, yr + iradius), IImageDrawer2D::Circle::Part::TOP_LEFT);
-		drawerBorderCircle.SetPartsPosition(Vec2i(xr - iradius + (int)_rectBorder.width - 1, yr + iradius), IImageDrawer2D::Circle::Part::TOP_RIGHT);
-		drawerBorderCircle.SetPartsPosition(Vec2i(xr + iradius, yr - iradius + (int)_rectBorder.height - 1), IImageDrawer2D::Circle::Part::BOTTOM_LEFT);
-		drawerBorderCircle.SetPartsPosition(Vec2i(xr - iradius + (int)_rectBorder.width - 1, yr - iradius + (int)_rectBorder.height - 1), IImageDrawer2D::Circle::Part::BOTTOM_RIGHT);
-
-		// DEBUG COLORS
-		/*borderCircle.color = Color::RED();
-		borderCircle.part = IImageDrawer2D::Circle::Part::TOP_LEFT;
-		drawerBorderCircle.Draw(borderCircle);
-		borderCircle.color = Color::GREEN();
-		borderCircle.part = IImageDrawer2D::Circle::Part::TOP_RIGHT;
-		drawerBorderCircle.Draw(borderCircle);
-		borderCircle.color = Color::YELLOW();
-		borderCircle.part = IImageDrawer2D::Circle::Part::BOTTOM_LEFT;
-		drawerBorderCircle.Draw(borderCircle);
-		borderCircle.color = Color::BLUE();
-		borderCircle.part = IImageDrawer2D::Circle::Part::BOTTOM_RIGHT;
-		drawerBorderCircle.Draw(borderCircle);*/
-
-		drawerBorderCircle.Draw(borderCircle);
-	}
-
-
-	bool ImageDrawer2DSDL::InfoRect::Init(const int& xr, const int& yr, const unsigned int& widthMax, const unsigned int& heightMax, const unsigned int& width, const unsigned int& height)
-	{
-		iw = (int)widthMax;
-		ih = (int)heightMax;
-
-		// Inside Image Verification
-		if (xr >= iw || yr >= ih)
-			return (false);
-
-		xMax = xr + (int)width;
-		yMax = yr + (int)height;
-
-		if (xMax < 0 || yMax < 0)
-			return (false);
-
-		// Set Correct Min X and Y
-		(xr <= 0) ? cX = 0 : cX = xr;
-		(yr <= 0) ? cY = 0 : cY = yr;
-		// Set Correct Max X and Y
-		(xMax > iw) ? cXMax = (iw - 1) : cXMax = xMax;
-		(yMax > ih) ? cYMax = (ih - 1) : cYMax = yMax;
-
-		return (true);
 	}
 
 	void ImageDrawer2DSDL::InfoCircleBressenham::Init(const float& diameter)

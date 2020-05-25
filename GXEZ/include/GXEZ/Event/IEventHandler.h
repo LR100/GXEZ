@@ -3,6 +3,7 @@
 
 #include "IEvent.h"
 
+#include <map>
 #include <unordered_map>
 #include <vector>
 #include <future>
@@ -80,6 +81,10 @@ namespace GXEZ
 			PushWork(event, f, args...);
 		}
 
+		void AddHandlerToEvent(const Event& event, std::function<void()> function)
+		{
+			PushWorkFct(event, function);
+		}
 		// Remove All Handlers (except PERMANENT)
 		void			Clear();
 
@@ -94,14 +99,16 @@ namespace GXEZ
 	private:
 
 		template <class Function, class ...Args>
-		void PushWork(const Event& event, Function&& f, Args&& ...args)
+		void PushWork(const Event& evt, Function&& f, Args&& ...args) {
+			PushWorkFct(evt, std::bind(std::forward<Function>(f), std::forward<Args>(args)...));
+		}
+
+		void PushWorkFct(const Event& event, std::function<void()> function)
 		{
 			std::cout << "Add Event: " << event.ToString();
 			EVENT_TYPE_HASH_ hash = event.GetHash();
-			_handlers[hash]._works.push_back(Work(std::bind(std::forward<Function>(f), std::forward<Args>(args)...), _curPriority));
-
-			if (_curPriority == Priority::PERMANENT)
-				_handlersPermanent[hash]._works.push_back(_handlers[hash]._works.back());
+			_handlers[_curPriority][hash]._works.push_back(Work(function, _curPriority));
+	
 		}
 
 		struct Work
@@ -117,9 +124,9 @@ namespace GXEZ
 		};
 
 
-		Priority											_curPriority;
-		std::unordered_map<EVENT_TYPE_HASH_, WorkList>		_handlers;
-		std::unordered_map<EVENT_TYPE_HASH_, WorkList>		_handlersPermanent;
+		Priority																		_curPriority;
+		std::map<Priority, std::unordered_map<EVENT_TYPE_HASH_, WorkList>>				_handlers;
+		std::map<Priority, std::unordered_map<EVENT_TYPE_HASH_, WorkList>>::iterator	_handlersIt, _handlersItEnd;
 	};
 
 }

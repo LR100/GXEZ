@@ -105,6 +105,15 @@
     <ClInclude Include="include\GXEZ\GUI\GUIItem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\GXEZ\Graphic\ADrawer2DExtended.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GXEZ\Graphic\ATexture2DManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GXEZ\Graphic\SDL\Texture2DManagerSDL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Event\IEvent.cpp">
@@ -171,6 +180,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GUI\GUIManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphic\ADrawer2DExtended.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphic\ATexture2DManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphic\SDL\Texture2DManagerSDL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

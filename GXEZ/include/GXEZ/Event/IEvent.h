@@ -15,10 +15,10 @@ namespace GXEZ
 
 	enum ControlKey : uint16_t
 	{
-		KEY_NONE = 0, // Stay AT TOP !
-		// KEYS
-		KEY_START,
 		/////////
+		// KEYS
+		/////////
+		KEY_NONE = 0, // Stay AT TOP !
 
 		// Using Value of Ascii Table
 		KEY_ESCAPE = 27,
@@ -37,32 +37,28 @@ namespace GXEZ
 		KEY_LCTRL, KEY_RCTRL,
 		KEY_LSHIFT, KEY_RSHIFT,
 		KEY_TAB,
+		KEY_LAST, // !! ALWAYS at END of KEYS !! //
 
-		// !! ALWAYS at END of KEYS !! //
-		KEY_END,
-
+		/////////
 		// MOUSE
-		MOUSE_START,
-
+		/////////
+		MOUSE_NONE = KEY_LAST,
 		MOUSE_LEFT,
 		MOUSE_RIGHT,
 		MOUSE_SCROLL,
 		MOUSE_MOTION,
+		MOUSE_LAST, // !! ALWAYS at END of MOUSE !! //
 
-		// !! ALWAYS at END of MOUSE !! //
-		MOUSE_END,
-
+		//////////
 		// WINDOW
-		WINDOW_START,
-
+		//////////
+		WINDOW_NONE = MOUSE_LAST,
 		WINDOW_CLOSE,
 		WINDOW_RESIZE,
 		WINDOW_MOVE,
 		WINDOW_FOCUS,
 		WINDOW_UNFOCUS,
-
-		// !! ALWAYS at END of WINDOW !! //
-		WINDOW_END
+		WINDOW_LAST, // !! ALWAYS at END of WINDOW !! //
 	};
 
 	struct Mouse

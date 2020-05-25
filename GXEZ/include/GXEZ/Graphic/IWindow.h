@@ -1,9 +1,13 @@
 #ifndef _IWINDOW_H_
 #define _IWINDOW_H_
 
+// STD
 #include <stdint.h>
 #include <string>
+#include <future>
+#include <functional>
 
+// GXEZ
 #include "GXEZ/Event/IEventHandler.h" // To link windows events to an eventhandler
 #include "GXEZ/Graphic/IImageDrawer2D.h"
 
@@ -48,10 +52,25 @@ namespace GXEZ
 
 		// Event Handler
 		virtual void				LinkEventHandler(IEventHandler* eventHandler) = 0;
+		virtual IEventHandler*		GetEventHandler() = 0;
+
+		template <class Function, class ...Args>
+		void						LinkEvent(ControlKey evt, Function&& f, Args&& ...args)
+		{
+			LinkEventFunction(evt, std::bind(std::forward<Function>(f), std::forward<Args>(args)...));
+		}
+
 		// Drawer
 		virtual void				LinkImageDrawer2D(IImageDrawer2D* drawer) = 0;
 		virtual void				UseImageDrawer2D() = 0;
 		virtual const ColorFormat&	GetColorFormat() const = 0;
+
+		///////////////
+		// PROTECTED //
+
+	protected:
+
+		virtual void				LinkEventFunction(ControlKey evt, std::function<void()> function) = 0;
 	};
 }
 

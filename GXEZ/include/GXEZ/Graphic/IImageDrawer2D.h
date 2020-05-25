@@ -8,7 +8,7 @@
 #include "GXEZ/Graphic/Color.h"
 #include "GXEZ/Graphic/Sprite.h"
 #include "GXEZ/Graphic/IImage.h"
-#include "GXEZ/Graphic/IDrawer2D.h"
+#include "GXEZ/Graphic/ADrawer2DExtended.h"
 
 #ifdef DrawText
 #undef DrawText
@@ -16,8 +16,8 @@
 
 namespace GXEZ
 {
-
-	class IImageDrawer2D : public IDrawer2D
+	
+	class IImageDrawer2D : public ADrawer2DExtended
 	{
 	public:
 		/// SHOULD INIT HIS TEXTURE AND SHAPES FROM A FILE AT LAUNCHING

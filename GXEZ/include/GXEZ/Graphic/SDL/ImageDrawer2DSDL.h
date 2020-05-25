@@ -95,10 +95,10 @@ namespace GXEZ
 		// Line
 		virtual void					DrawLine(const Vec2i& a, const Vec2i& b, const Color& color)  override;
 		// Rect
-		virtual void					DrawRectBorder(const Vec2i& pos, const RectBorder& borderdef)  override;
-		virtual void					DrawRect(const Vec2i& pos, const Rect& rect) override;
+		//virtual void					DrawRectBorder(const Vec2i& pos, const RectBorder& borderdef)  override;
+		//virtual void					DrawRect(const Vec2i& pos, const Rect& rect) override;
 		// Circle
-		virtual void					DrawCircle(const Vec2i& pos, const Circle& circle)  override;
+		//virtual void					DrawCircle(const Vec2i& pos, const Circle& circle)  override;
 		// Text
 		virtual void					DrawText(const Vec2i& pos, const Text& text) override;
 
@@ -131,6 +131,10 @@ namespace GXEZ
 		virtual void					SetSpriteColorTransparency(const Color& color) override;
 		virtual void					DrawSprite(const int& x, const int& y) override;
 		virtual void					DrawSprite(const int& x, const int& y, Sprite* sprite) override;
+
+
+
+
 		///
 		// OTHERS -
 		///
@@ -168,6 +172,20 @@ namespace GXEZ
 			int		dy;
 			float	sum;
 		};
+
+	protected:
+
+
+		//////////////////// ADRAWER 2D EXTENDED ////////////////////
+		/// NEW METHODS 
+
+		// Point
+		void					InternDrawPoint(const Vec2i& pos, const Color& color) override;
+		// Line
+		void					InternDrawLine(const Vec2i& a, const Vec2i& b, const Color& color) override;
+		// Rect
+		void					InternDrawRectBorder(const Vec2i& pos, const IDrawer2D::RectBorder& borderdef) override;
+		void					InternDrawRect(const Vec2i& pos, const IDrawer2D::Rect& rect) override;
 
 	private:
 
@@ -217,17 +235,6 @@ namespace GXEZ
 			int		xi, yi;
 		};
 
-		struct InfoRect
-		{
-			bool	Init(const int& xr, const int& yr, const unsigned int& widthMax, const unsigned int& heightMax, const unsigned int& width, const unsigned int& height);
-
-			int		xMax, yMax;
-			int		xi, yi;
-			int		iw, ih;
-			int		cX, cY;
-			int		cXMax, cYMax;
-		};
-
 		struct InfoCircle
 		{
 			int		xi, yi;
@@ -244,85 +251,6 @@ namespace GXEZ
 			int		d;
 		};
 
-		class DrawerCircleBressenham
-		{
-		public:
-			DrawerCircleBressenham(ImageDrawer2DSDL* drawer);
-			// Use X and Y as center for each parts
-			void	Draw(const int& _x, const int& _y, const Circle& circle);
-			// Use Part Parts Position
-			void	Draw(const Circle& circle);
-			void	SetPartsPosition(const Vec2i& pos, const Circle::Part& part);
-
-		private:
-
-			Vec2i	pTL, pTR, pBL, pBR;
-			int		t;
-			int		r;
-			int		x, y;
-			int		d;
-
-			typedef			void(DrawerCircleBressenham::* DrawCircleBressenhamFunction)();
-
-			inline void	DrawFull();
-			inline void	DrawTop();
-			inline void	DrawTopLeft();
-			inline void	DrawTopRight();
-			inline void	DrawBottom();
-			inline void	DrawBottomLeft();
-			inline void	DrawBottomRight();
-
-			Circle							_circle;
-			DrawCircleBressenhamFunction	_drawFct;
-			ImageDrawer2DSDL* _drawer;
-		};
-
-		class IDrawerRect
-		{
-		public:
-			IDrawerRect(ImageDrawer2DSDL* drawer);
-
-		protected:
-			virtual void	DrawStart(const int& _x, const int& _y, Rect& rect);
-			// Can verify additional things on init if everything was fine on classic init
-			virtual bool	OnDrawInit() { return (true); };
-
-			virtual void	DrawClassic() = 0;
-			virtual void	DrawRadius() = 0;
-
-			int				xr, yr;
-			InfoRect		_iR;
-			ImageDrawer2DSDL* _drawer;
-
-
-		private:
-			bool			DrawInit(const int& _x, const int& _y, Rect& rect);
-		};
-
-		class DrawerRect : public IDrawerRect
-		{
-		public:
-			DrawerRect(ImageDrawer2DSDL* drawer) : IDrawerRect(drawer) {};
-			void	Draw(const int& _x, const int& _y, const Rect& rect);
-		private:
-			virtual void	DrawClassic() override;
-			virtual void	DrawRadius() override;
-
-			Rect			_rect;
-		};
-
-		class DrawerRectBorder : public IDrawerRect
-		{
-		public:
-			DrawerRectBorder(ImageDrawer2DSDL* drawer) : IDrawerRect(drawer) {};
-			void	Draw(const int& _x, const int& _y, const RectBorder& rectBorder);
-		private:
-			virtual void	DrawClassic() override;
-			virtual void	DrawRadius() override;
-
-			RectBorder		_rectBorder;
-		};
-
 		struct InfoInternLine
 		{
 			int		x;
@@ -334,12 +262,9 @@ namespace GXEZ
 		InfoInternLine									_iIL;
 		// Rect
 		InfoRect										_iR;
-		DrawerRect										_dR;
 		// Rect Border
-		DrawerRectBorder								_dRB;
 		// Circle
 		InfoCircle										_iC;
-		DrawerCircleBressenham							_dCBr;
 
 
 		// Colors Manipulation attributs

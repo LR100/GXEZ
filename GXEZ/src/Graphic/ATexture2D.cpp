@@ -1,56 +1,76 @@
 #include "GXEZ/Graphic/ATexture2D.h"
 
+// Texture Manager
+#include "GXEZ/Graphic/ATexture2DManager.h"
+// Renderer
 #include "GXEZ/Graphic/IRenderer.h"
 
 namespace GXEZ
 {
-	ATexture2D::ATexture2D(const Definition& definition, IRenderer* renderer) : _definition(definition)
+
+	ATexture2D::ATexture2D(const Definition& definition, ATexture2DManager* manager) : _definition(definition)
 	{
-		if (renderer == NULL) {
-			throw ("ATexture2D::ATexture2D : ERROR : IRenderer cannot be NULL");
+
+		if (manager == NULL) {
+			throw ("ATexture2D::ATexture2D : ERROR : ATextureManager cannot be NULL");
 		}
-		_renderer = renderer;
-		_renderer->CreateTexture2D(_definition, this);
-		// Must Create Basics Now
+		_manager = manager;
+		_manager->RegisterTexture2D(this);
 	}
 
 	ATexture2D::~ATexture2D()
 	{
+		_manager->UnRegisterTexture2D(this);
 	}
 
-	inline void ATexture2D::UseAsRenderTarget()
+	void ATexture2D::UseAsRenderTarget(const bool& state)
 	{
-		_renderer->SetRenderTarget(this);
+		if (state)
+		{
+			_manager->GetRenderer()->SetRenderTarget(this);
+		}
+		else
+		{
+			// Do Nothing
+		}
 	}
 
-	inline void ATexture2D::DrawPoint(const Vec2i& pos, const Color& color)
+	void ATexture2D::Save()
 	{
-		_renderer->DrawPoint(pos, color);
 	}
 
-	inline void ATexture2D::DrawLine(const Vec2i& a, const Vec2i& b, const Color& color)
+	void ATexture2D::Restore()
 	{
-		_renderer->DrawLine(a, b, color);
 	}
 
-	inline void ATexture2D::DrawRectBorder(const Vec2i& pos, const IDrawer2D::RectBorder& borderdef)
+	void ATexture2D::DrawPoint(const Vec2i& pos, const Color& color)
 	{
-		_renderer->DrawRectBorder(pos, borderdef);
+		_manager->GetRenderer()->DrawPoint(pos, color);
 	}
 
-	inline void ATexture2D::DrawRect(const Vec2i& pos, const IDrawer2D::Rect& rect)
+	void ATexture2D::DrawLine(const Vec2i& a, const Vec2i& b, const Color& color)
 	{
-		_renderer->DrawRect(pos, rect);
+		_manager->GetRenderer()->DrawLine(a, b, color);
 	}
 
-	inline void ATexture2D::DrawCircle(const Vec2i& pos, const IDrawer2D::Circle& circle)
+	void ATexture2D::DrawRectBorder(const Vec2i& pos, const IDrawer2D::RectBorder& borderdef)
 	{
-		_renderer->DrawCircle(pos, circle);
+		_manager->GetRenderer()->DrawRectBorder(pos, borderdef);
 	}
 
-	inline void ATexture2D::DrawText(const Vec2i& pos, const IDrawer2D::Text& text)
+	void ATexture2D::DrawRect(const Vec2i& pos, const IDrawer2D::Rect& rect)
 	{
-		_renderer->DrawText(pos, text);
+		_manager->GetRenderer()->DrawRect(pos, rect);
+	}
+
+	void ATexture2D::DrawCircle(const Vec2i& pos, const IDrawer2D::Circle& circle)
+	{
+		_manager->GetRenderer()->DrawCircle(pos, circle);
+	}
+
+	void ATexture2D::DrawText(const Vec2i& pos, const IDrawer2D::Text& text)
+	{
+		_manager->GetRenderer()->DrawText(pos, text);
 	}
 
 	const ATexture2D::Definition& ATexture2D::GetDefinition() const
@@ -66,10 +86,6 @@ namespace GXEZ
 	void ATexture2D::SetCenter(const Vec2i& center)
 	{
 		_center = center;
-	}
-
-	ATexture2D::Definition::Definition()
-	{
 	}
 
 	ATexture2D::Definition::Definition(const std::string& _file)

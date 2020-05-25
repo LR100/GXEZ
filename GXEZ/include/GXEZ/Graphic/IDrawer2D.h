@@ -8,7 +8,6 @@ using namespace MXEZ;
 
 namespace GXEZ
 {
-
 	class IDrawer2D
 	{
 	public:
@@ -83,13 +82,13 @@ namespace GXEZ
 		/////////////////////////
 		// Shapes DRAW Methods //
 		/////////////////////////
-
+	
 		// Point
 		virtual void					DrawPoint(const Vec2i& pos, const Color& color) = 0;
 		// Line
 		virtual void					DrawLine(const Vec2i& a, const Vec2i& b, const Color& color) = 0;
 		// Rect
-		virtual void					DrawRectBorder(const Vec2i& pos, const IDrawer2D::RectBorder& borderdef) = 0;
+		virtual void					DrawRectBorder(const Vec2i& pos, const IDrawer2D::RectBorder& rectBorder) = 0;
 		virtual void					DrawRect(const Vec2i& pos, const IDrawer2D::Rect& rect) = 0;
 		// Circle
 		virtual void					DrawCircle(const Vec2i& pos, const IDrawer2D::Circle& circle) = 0;

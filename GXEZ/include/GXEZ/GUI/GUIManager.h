@@ -8,6 +8,7 @@
 // STD
 #include <unordered_map>
 #include <vector>
+#include <list>
 
 // MXEZ
 #include "MXEZ/AABB/QuadTree.h"
@@ -40,7 +41,7 @@ namespace GXEZ
 			GUIScreen(GUIManager* manager, IRenderer* renderer, const GUIItem::Definition& definition);
 		private:
 			virtual void	OnDraw(IRenderer* renderer) override;
-			virtual void	CreateTextures() override;
+			virtual void	CreateTexture() override;
 		};
 		 
 		// Event Handling //
@@ -58,7 +59,7 @@ namespace GXEZ
 		std::vector<GUIItem*>						_items;
 		std::unordered_map<unsigned int, GUIItem*>	_itemsByID;
 		std::vector<unsigned int>					_itemsAvailablesIDs;
-		std::vector<GUIItem*>						_itemsHovered;
+		std::list<GUIItem*>							_itemsHovered;
 		std::vector<GUIItem*>						_itemsClicked;
 		GUIItem* _itemHovered; // Top Foreground
 		// Root Item

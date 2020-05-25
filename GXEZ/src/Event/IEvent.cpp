@@ -112,11 +112,11 @@ namespace GXEZ
 
 	Event::Type Event::GetTypeFromControlKey(const ControlKey& key)
 	{
-		if (key > ControlKey::KEY_START&& key < ControlKey::KEY_END)
+		if (key > ControlKey::KEY_NONE&& key < ControlKey::KEY_LAST)
 			return (Event::Type::KEY);
-		else if (key > ControlKey::MOUSE_START&& key < ControlKey::MOUSE_END)
+		else if (key > ControlKey::MOUSE_NONE&& key < ControlKey::MOUSE_LAST)
 			return (Event::Type::MOUSE);
-		else if (key > ControlKey::WINDOW_START&& key < ControlKey::WINDOW_END)
+		else if (key > ControlKey::WINDOW_NONE&& key < ControlKey::WINDOW_LAST)
 			return (Event::Type::WINDOW);
 		else
 			return (Event::Type::NONE);
@@ -124,11 +124,11 @@ namespace GXEZ
 
 	ControlKeyState Event::GetDefaultControlKeyStateFromControlKey(const ControlKey& key)
 	{
-		if (key > ControlKey::KEY_START&& key < ControlKey::KEY_END)
+		if (key > ControlKey::KEY_NONE&& key < ControlKey::KEY_LAST)
 			return (ControlKeyState::PRESSED);
-		else if (key > ControlKey::MOUSE_START&& key < ControlKey::MOUSE_END)
+		else if (key > ControlKey::MOUSE_NONE&& key < ControlKey::MOUSE_LAST)
 			return (ControlKeyState::PRESSED);
-		else if (key > ControlKey::WINDOW_START&& key < ControlKey::WINDOW_END)
+		else if (key > ControlKey::WINDOW_NONE&& key < ControlKey::WINDOW_LAST)
 			return (ControlKeyState::NONE);
 		return (ControlKeyState::NONE);
 	}

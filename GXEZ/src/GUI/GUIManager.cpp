@@ -13,7 +13,7 @@ namespace GXEZ
 		for (unsigned int i = 1; i < GUI_MANAGER_ITEMS_MAX; i += 1) { // Items IDs start at 1 !!!!!
 			_itemsAvailablesIDs.push_back(i);
 		}
-		
+
 		_screenDef.size.width = (float)_width;
 		_screenDef.size.height = (float)_height;
 		_screenDef.size.type = GUIItem::UnitType::ABSOLUTE_PX;
@@ -103,6 +103,7 @@ namespace GXEZ
 
 	void GUIManager::EventMouseLeftPress()
 	{
+		RemoveItemsClickedByMouse();
 		InsertItemsClickedByMouse();
 	}
 
@@ -114,15 +115,14 @@ namespace GXEZ
 	void GUIManager::UpdateItemsHoveredByMouse()
 	{
 		_itemHovered = NULL;
-		if (_itemsHovered.size())
-		{
-			// Clear Previous Items Hovered
-			for (size_t i = 0; i < _itemsHovered.size(); i += 1) {
-				_itemsHovered.at(i)->SetHovered(false);
-			}
-			_itemsHovered.clear();
-		}
-		// And Set New Ones
+
+		// Keep previous hovered
+		std::list<GUIItem*> previousHovered = _itemsHovered;
+		std::list<GUIItem*> currentHovered;
+		auto it = _itemsHovered.begin();
+		auto itEnd = _itemsHovered.end();
+
+		// Set New Ones
 		if (_eventHandler) {
 			const Mouse* mouse = _eventHandler->GetMouse();
 			Vec2i pos;
@@ -141,19 +141,42 @@ namespace GXEZ
 					_itemHovered = itemCursor;
 					zIndexMax = itemCursor->GetZIndex();
 				}
-				_itemsHovered.push_back(itemCursor);
+				if (previousHovered.size())
+				{
+					it = previousHovered.begin();
+					for (; it != previousHovered.end();) {
+						if ((*it) == itemCursor)
+							it = previousHovered.erase(it);
+						else 
+							it++;
+					}
+				}
+				currentHovered.push_back(itemCursor);				
 				// std::cout << "Item Hovered:" << indexes.at(i)->GetData()->GetType() << std::endl;
 			}
 		}
+
+		_itemsHovered = currentHovered;
+
+		// Clear Previous Items Hovered
+		it = previousHovered.begin();
+		itEnd = previousHovered.end();
+		for (; it != itEnd; it++) {
+			(*it)->SetHovered(false);
+		}
+		previousHovered.clear();
 	}
 
 	void GUIManager::InsertItemsClickedByMouse()
 	{
 		// std::cout << "Clicked" << std::endl;
-		for (size_t i = 0; i < _itemsHovered.size(); i += 1)
+		auto it = _itemsHovered.begin();
+		auto itEnd = _itemsHovered.end();
+
+		for (; it != itEnd; it++)
 		{
-			_itemsHovered.at(i)->SetClicked(true);
-			_itemsClicked.push_back(_itemsHovered.at(i));
+			(*it)->SetClicked(true);
+			_itemsClicked.push_back((*it));
 		}
 	}
 
@@ -176,7 +199,7 @@ namespace GXEZ
 	{
 	}
 
-	void GUIManager::GUIScreen::CreateTextures()
+	void GUIManager::GUIScreen::CreateTexture()
 	{
 	}
 

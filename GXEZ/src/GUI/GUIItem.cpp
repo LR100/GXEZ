@@ -9,6 +9,13 @@
 
 namespace GXEZ
 {
+
+	/////////////////////////////
+	///////////////////////
+	////// GUI ITEM 
+	//// 
+	///
+
 	GUIItem::GUIItem(GUIManager* manager, GUIItem* parent, IRenderer* renderer, GUIItem::ItemType type, const GUIItem::Definition& definition)
 	{
 		_id = 0;
@@ -17,11 +24,12 @@ namespace GXEZ
 		_parent = NULL;
 		_realPosition.x = 0;
 		_realPosition.y = 0;
-		_realSize.x= 0;
+		_realSize.x = 0;
 		_realSize.y = 0;
 		_isVisible = true;
 		_isHovered = false;
 		_isClicked = false;
+		_isSelected = false;
 		SetParent(parent);
 		SetDefinition(definition);
 		// Must Be At End !! LinkItem finish the init
@@ -35,6 +43,14 @@ namespace GXEZ
 		}
 	}
 
+	GUIItem::Handler::Handler(std::function<void()> f) : _function(f)
+	{
+	}
+
+	void GUIItem::Definition::LoadDefault()
+	{
+	}
+
 	void GUIItem::Resize(const Definition::Size& size)
 	{
 		_definition.size = size;
@@ -44,6 +60,7 @@ namespace GXEZ
 	void GUIItem::Draw(IRenderer* renderer)
 	{
 		if (_isVisible) {
+			//std::cout << "GUIItem::Draw (" << _id << ")" << std::endl;
 			OnDraw(renderer);
 		}
 	}
@@ -77,6 +94,7 @@ namespace GXEZ
 	void GUIItem::SetDefinition(const GUIItem::Definition& definition)
 	{
 		_definition = definition;
+		_definition.LoadDefault();
 		ComputeRealPosition();
 		ComputeRealSize();
 		ComputeAABB();
@@ -134,9 +152,10 @@ namespace GXEZ
 	{
 		if (_isClicked != state)
 		{
-			// std::cout << "Item Clicked (" << state << ")" << std::endl;
+			std::cout << "Item Clicked (" << state << ")" << std::endl;
 			_isClicked = state;
 			// Call Overridable Method On Click
+			OnChanged();
 			OnClick(state);
 		}
 	}
@@ -146,22 +165,15 @@ namespace GXEZ
 		return (_isClicked);
 	}
 
-	void GUIItem::SetVisibile(bool state)
-	{
-		if (_isVisible != state)
-		{
-			_isVisible = state;
-			// Call Overridable Method On Click
-			OnVisible(state);
-		}
-	}
 
 	void GUIItem::SetHovered(bool state)
 	{
 		if (_isHovered != state)
 		{
+			std::cout << "GUIItem(" << _id << ")::SetHovered (" << state << ")" << std::endl;
 			_isHovered = state;
 			// Call Overridable Method On Click
+			OnChanged();
 			OnHovered(state);
 		}
 	}
@@ -169,6 +181,32 @@ namespace GXEZ
 	const bool& GUIItem::IsHovered() const
 	{
 		return (_isHovered);
+	}
+
+	void GUIItem::SetSelected(bool state)
+	{
+	}
+
+	const bool& GUIItem::IsSelected() const
+	{
+		return (_isSelected);
+	}
+
+	void GUIItem::SetVisible(bool state)
+	{
+		if (_isVisible != state)
+		{
+			std::cout << "GUIItem(" << _id << ")::SetVisible (" << state << ")" << std::endl;
+			_isVisible = state;
+			// Call Overridable Method On Click
+			OnChanged();
+			OnVisible(state);
+		}
+	}
+
+	const bool& GUIItem::IsVisible() const
+	{
+		return (_isVisible);
 	}
 
 	void GUIItem::SetZIndex(const int& zindex)
@@ -183,14 +221,7 @@ namespace GXEZ
 
 	void GUIItem::ClearTextures()
 	{
-		// std::cout << "GUIItem::ClearTextures()" << std::endl;
-		for (size_t i = 0; i < _textures.size(); i += 1)
-		{
-			if (_textures.at(i) != NULL) {
-				delete (_textures.at(i));
-			}
-		}
-		_textures.clear();
+		delete (_texture);
 	}
 
 	const Vec2i& GUIItem::GetRealPosition() const
@@ -211,7 +242,7 @@ namespace GXEZ
 		ComputeAABB();
 		if (previousSize != GetRealSize())
 		{
-			OnSizeChanged();
+			OnChanged();
 		}
 		for (size_t i = 0; i < _children.size(); i += 1)
 		{
@@ -219,22 +250,24 @@ namespace GXEZ
 		}
 	}
 
-	void GUIItem::OnSizeChanged()
+
+
+	void GUIItem::OnChanged()
 	{
-		std::cout << "GUIItem::OnSizeChanged()" << std::endl;
-		CreateTextures();
+		std::cout << "GUIItem::OnChanged()" << std::endl;
+		CreateTexture();
 	}
 
 	void GUIItem::ComputeRealPosition()
 	{
 		if (_definition.position.type == UnitType::ABSOLUTE_PX)
 		{
-			_realPosition.x = (int)_definition.position.x;
-			_realPosition.y = (int)_definition.position.y;
+			_realPosition.x = (int)_definition.position.x.value();
+			_realPosition.y = (int)_definition.position.y.value();
 		}
 		else if (_definition.position.type == UnitType::RELATIVE_TO_PARENT && _parent != NULL) {
-			_realPosition.x = (int)((float)_parent->GetRealPosition().x + ((float)_parent->GetRealSize().x* _definition.position.x));
-			_realPosition.y = (int)((float)_parent->GetRealPosition().y + ((float)_parent->GetRealSize().y * _definition.position.y));
+			_realPosition.x = (int)((float)_parent->GetRealPosition().x + ((float)_parent->GetRealSize().x * _definition.position.x.value()));
+			_realPosition.y = (int)((float)_parent->GetRealPosition().y + ((float)_parent->GetRealSize().y * _definition.position.y.value()));
 		}
 		else {
 			_realPosition.x = 0;
@@ -247,12 +280,12 @@ namespace GXEZ
 	{
 		if (_definition.size.type == UnitType::ABSOLUTE_PX)
 		{
-			_realSize.x = (int)_definition.size.width;
-			_realSize.y = (int)_definition.size.height;
+			_realSize.x = (int)_definition.size.width.value();
+			_realSize.y = (int)_definition.size.height.value();
 		}
 		else if (_definition.size.type == UnitType::RELATIVE_TO_PARENT && _parent != NULL) {
-			_realSize.x = (int)((float)_parent->GetRealSize().x * _definition.size.width);
-			_realSize.y = (int)((float)_parent->GetRealSize().y * _definition.size.height);
+			_realSize.x = (int)((float)_parent->GetRealSize().x * _definition.size.width.value());
+			_realSize.y = (int)((float)_parent->GetRealSize().y * _definition.size.height.value());
 		}
 		else {
 			_realSize.x = 0;
@@ -277,6 +310,73 @@ namespace GXEZ
 		_onClickHandler = NULL;
 	}
 
+#define GUIBUTTON_DEFAULT_BACKGROUND_COLOR_NORMAL Color(225, 225, 225, 255)
+#define GUIBUTTON_DEFAULT_BACKGROUND_COLOR_HOVERED Color(229, 241, 251, 255)
+#define GUIBUTTON_DEFAULT_BORDER_COLOR_NORMAL Color(173, 173, 173, 255)
+#define GUIBUTTON_DEFAULT_BORDER_COLOR_HOVERED Color(0, 120, 215, 255)
+
+	GUIButton::Definition::Definition()
+	{
+		// Defaults Values - Mandatories - Will be set even if user do not set them
+		size.width = 60;
+		size.height = 20;
+		border.radius = 0;
+		border.size = 2;
+	}
+
+	void GUIButton::Definition::LoadDefault()
+	{	
+		std::cout << "GUIButton::Definition::LoadDefault()" << std::endl;
+		// Default Before
+		LoadDefaultModificator(hovered, GUIButton::ModificatorID::GUIBUTTONMODIFICATOR_HOVERED_ID);
+		LoadDefaultModificator(clicked, GUIButton::ModificatorID::GUIBUTTONMODIFICATOR_CLICKED_ID);
+		LoadDefaultModificator(selected, GUIButton::ModificatorID::GUIBUTTONMODIFICATOR_SELECTED_ID);
+		// Default After 
+		if (!border.color.has_value()) {
+			border.color = Color(GUIBUTTON_DEFAULT_BORDER_COLOR_NORMAL);
+		}
+		if (!background.color.has_value()) {
+			background.color = Color(GUIBUTTON_DEFAULT_BACKGROUND_COLOR_NORMAL);
+		}
+	}
+
+	void GUIButton::Definition::LoadDefaultModificator(GUIButton::DefinitionModificator& modificator, const GUIButton::ModificatorID& id)
+	{
+		std::cout << "LoadDefaultModificator (" << id << ")" << std::endl;
+		if (!modificator.background.color.has_value())
+		{
+			if (background.color.has_value()) {
+				modificator.background.color = background.color.value();
+			} else { // DEFAULT Color Panels
+				if (id == GUIButton::ModificatorID::GUIBUTTONMODIFICATOR_HOVERED_ID)
+					modificator.background.color = GUIBUTTON_DEFAULT_BACKGROUND_COLOR_HOVERED;
+				else if (id == GUIButton::ModificatorID::GUIBUTTONMODIFICATOR_SELECTED_ID)
+					modificator.background.color = GUIBUTTON_DEFAULT_BACKGROUND_COLOR_NORMAL;
+				else if (id == GUIButton::ModificatorID::GUIBUTTONMODIFICATOR_CLICKED_ID)
+					modificator.background.color = Color(229, 241, 251);
+			}
+		}
+		if (!modificator.border.color.has_value())
+		{
+			if (border.color.has_value()) {
+				modificator.border.color = border.color.value();
+			} else { // DEFAULT Color Panels
+				if (id == GUIButton::ModificatorID::GUIBUTTONMODIFICATOR_HOVERED_ID)
+					modificator.border.color = GUIBUTTON_DEFAULT_BORDER_COLOR_HOVERED;
+				else if (id == GUIButton::ModificatorID::GUIBUTTONMODIFICATOR_SELECTED_ID)
+					modificator.border.color = GUIBUTTON_DEFAULT_BORDER_COLOR_NORMAL;
+				else if (id == GUIButton::ModificatorID::GUIBUTTONMODIFICATOR_CLICKED_ID)
+					modificator.border.color = Color(229, 241, 251);
+			}
+		}
+		if (!modificator.border.size.has_value())
+			modificator.border.size = border.size.value();
+		if (!modificator.border.sizeType.has_value())
+			modificator.border.sizeType = border.sizeType.value();
+		if (!modificator.border.radius.has_value())
+			modificator.border.radius = border.radius.value();
+	}
+
 	void GUIButton::OnClick(bool state)
 	{
 		if (state == false) // was previously true -> trigger the click (could even check if button is still hovered)
@@ -287,12 +387,21 @@ namespace GXEZ
 		}
 	}
 
-	void GUIButton::CreateTextures()
+	void GUIButton::CreateTexture()
 	{
 		ClearTextures();
-		CreateTextureNormal();
+		/*CreateTextureNormal();
 		CreateTextureHovered();
-		CreateTextureClicked();
+		CreateTextureClicked();*/
+		//std::cout << "GUIButton::Draw() Texture Size (" << _textures.size() << ")" << std::endl;
+		if (IsClicked()) // Draw Cliked Texture
+			CreateTextureClicked();
+		else if (IsHovered()) // Draw Hovered Texture
+			CreateTextureHovered();
+		else if (IsSelected()) // Draw Selected Texture
+			CreateTextureSelected();
+		else // Draw Normal Texture
+			CreateTextureNormal();
 	}
 
 	ATexture2D* GUIButton::CreateTextureBase(const GUIItem::Definition::Border& border, const GUIItem::Definition::Background& background)
@@ -303,15 +412,31 @@ namespace GXEZ
 
 		////// DRAW //////
 		Vec2i pos;
+		pos.x = 0;
+		pos.y = 0;
+
+		std::cout << "GUIButton::RECT BORDER SIZE (" << border.size.value() << ")" << std::endl;;
 
 		// Button Borders
 		IDrawer2D::RectBorder rectBorder;
 
 		rectBorder.width = GetRealSize().x;
 		rectBorder.height = GetRealSize().y;
-		rectBorder.color = border.color;
-		rectBorder.size = border.size; // Convert Needed from UnitType
-		rectBorder.radius = border.radius;
+		rectBorder.color = border.color.value();
+		rectBorder.size = border.size.value(); // Convert Needed from UnitType
+		rectBorder.radius = border.radius.value();
+
+		Vec2 max;
+
+		max.x = GetRealSize().x / 2;
+		max.y = GetRealSize().y / 2;
+
+		if (rectBorder.radius > max.x) {
+			rectBorder.radius = max.x;
+		}
+		if (rectBorder.radius > max.y) {
+			rectBorder.radius = max.y;
+		}		
 		// std::cout << "GUIButton::CreateTextureBase Border Radius (" << border.radius << ")" << std::endl;
 
 		texture->DrawRectBorder(pos, rectBorder);
@@ -319,84 +444,68 @@ namespace GXEZ
 		// BackGround
 		IDrawer2D::Rect rect;
 
-		rect.width = (GetRealSize().x - (border.size * 2));
-		rect.height = (GetRealSize().y - (border.size * 2));
-		rect.color = background.color;
-		rect.radius = border.radius;
-		pos.x = int(border.size);
-		pos.y = pos.x;
+		if (rectBorder.size > rectBorder.radius)
+		{
+			rect.width = (GetRealSize().x - (border.size.value() * 2));
+			rect.height = (GetRealSize().y - (border.size.value() * 2));
+			rect.color = background.color.value();
+			pos.x = int(border.size.value());
+			pos.y = int(border.size.value());
+			texture->DrawRect(pos, rect);
+		}
+		else
+		{
+			float diff = (rectBorder.radius - rectBorder.size);
+			Vec2 tl, tr, bl, br;
 
-		texture->DrawRect(pos, rect);
+			rect.width = (GetRealSize().x - (border.size.value() * 2)) + 2;
+			rect.height = (GetRealSize().y - (border.size.value() * 2)) + 2;
+			rect.color = background.color.value();
+			rect.radius = diff;
+			pos.x = int(border.size.value()) - 1;
+			pos.y = int(border.size.value()) - 1;
+			texture->DrawRect(pos, rect);
+		}
 
-		///// CIRCLE TEST /////
-
-		//IImageDrawer2D::Circle circle;
-
-		//circle.diameter = border.radius * 2;
-
-		//Vec2i pc(int(GetRealSizeWidth() / 2), int(GetRealSizeHeight() / 2));
-
-		//circle.color = Color::RED();
-		//circle.part = IImageDrawer2D::Circle::Part::TOP_LEFT;
-		//_renderer->DrawCircle(pc.x, pc.y, circle);
-
-		//circle.color = Color::GREEN();
-		//circle.part = IImageDrawer2D::Circle::Part::TOP_RIGHT;
-		//_renderer->DrawCircle(pc.x, pc.y, circle);
-
-		//circle.color = Color::YELLOW();
-		//circle.part = IImageDrawer2D::Circle::Part::BOTTOM_LEFT;
-		//_renderer->DrawCircle(pc.x, pc.y, circle);
-
-		//circle.color = Color::BLUE();
-		//circle.part = IImageDrawer2D::Circle::Part::BOTTOM_RIGHT;
-		//_renderer->DrawCircle(pc.x, pc.y, circle);
-
-		// imageBuffer->Export("test");
-
-		// ColorDef	colorDefTransparency;
-		//sprite = new Texture(imageBuffer, colorDefTransparency);
-		
+		texture->UseAsRenderTarget(false);
 
 		return (texture);
 	}
 
 	void GUIButton::CreateTextureNormal()
 	{
-		_textures.push_back(CreateTextureBase(_definitionButton.border, _definitionButton.background));
+		std::cout << "GUIButton::CreateTextureNormal()" << std::endl;
+		_texture = CreateTextureBase(_definitionButton.border, _definitionButton.background);
 	}
 
 	void GUIButton::CreateTextureHovered()
 	{
-		_textures.push_back(CreateTextureBase(_definitionButton.hovered.border, _definitionButton.hovered.background));
+		std::cout << "GUIButton::CreateTextureHovered()" << std::endl;
+		_texture = CreateTextureBase(_definitionButton.hovered.border, _definitionButton.hovered.background);
 	}
 
 	void GUIButton::CreateTextureClicked()
 	{
-		_textures.push_back(CreateTextureBase(_definitionButton.clicked.border, _definitionButton.clicked.background));
+		std::cout << "GUIButton::CreateTextureClicked()" << std::endl;
+		_texture = CreateTextureBase(_definitionButton.clicked.border, _definitionButton.clicked.background);
+	}
+
+	void GUIButton::CreateTextureSelected()
+	{
+		std::cout << "GUIButton::CreateTextureSelected()" << std::endl;
+		_texture = CreateTextureBase(_definitionButton.selected.border, _definitionButton.selected.background);
 	}
 
 	void GUIButton::OnDraw(IRenderer* renderer)
 	{
-		// std::cout << "GUIButton::Draw()" << std::endl;
-		if (IsClicked())
-		{ // Draw Cliked Texture
-			renderer->DrawTexture(GetRealPosition(), _textures.at(2));
-		}
-		else if (IsHovered())
-		{ // Draw Hovered Texture
-			renderer->DrawTexture(GetRealPosition(), _textures.at(1));
-		}
-		else
-		{ // Draw Normal Texture
-			renderer->DrawTexture(GetRealPosition(), _textures.at(0));
-		}
+		renderer->DrawTexture(GetRealPosition(), _texture);
 	}
 
 	void GUIButton::SetDefinitionButton(const GUIButton::Definition& definition)
 	{
 		_definitionButton = definition;
-		CreateTextures();
+		_definitionButton.LoadDefault();
+		CreateTexture();
 	}
 
 	GUICanvas::GUICanvas(GUIManager* manager, GUIItem* parent, IRenderer* renderer, const GUIItem::Definition& definition) : GUIItem(manager, parent, renderer, GUIItem::ItemType::BUTTON, definition)
@@ -408,13 +517,11 @@ namespace GXEZ
 		// Do Nothing
 	}
 
-	void GUICanvas::CreateTextures()
+	void GUICanvas::CreateTexture()
 	{
 		// No Texture
 	}
 
-	GUIItem::Handler::Handler(std::function<void()> f) : _function(f)
-	{
-	}
+
 
 }

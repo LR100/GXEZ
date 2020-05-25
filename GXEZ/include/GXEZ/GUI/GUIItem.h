@@ -3,8 +3,10 @@
 // STD
 #include <future> // for handlers (like onClick, ....)
 #include <functional>
+#include <optional>
 #include <stdint.h> 
 #include <vector>
+
 
 // MXEZ
 #include "MXEZ/AABB/AABB.h"
@@ -15,6 +17,7 @@ using namespace MXEZ;
 // GXEZ
 #include "GXEZ/Graphic/IRenderer.h"
 #include "GXEZ/Graphic/Color.h"
+
 
 ///////////////////
 // FULL RELATIVE //
@@ -60,23 +63,24 @@ namespace GXEZ
 					height = 0;
 					type = UnitType::ABSOLUTE_PX;
 				}
-				float				width;
-				float				height;
-				GUIItem::UnitType	type;
+
+				std::optional<float>				width;
+				std::optional<float>				height;
+				std::optional<GUIItem::UnitType>	type;
 			};
 
 			struct Border
 			{
 				Border()
 				{
-					radius = 0;
-					size = 0;
 					sizeType = UnitType::ABSOLUTE_PX;
 				}
-				Color					color;
-				float					size;
-				GUIItem::UnitType		sizeType;
-				float					radius;
+
+			//private:
+				std::optional<Color>				color;
+				std::optional<float>				size;
+				std::optional<GUIItem::UnitType>	sizeType;
+				std::optional<float>				radius;
 			};
 
 			struct Position
@@ -87,21 +91,27 @@ namespace GXEZ
 					y = 0;
 					type = UnitType::ABSOLUTE_PX;
 				}
-				float				x;
-				float				y;
-				GUIItem::UnitType	type;
+			//private:
+				std::optional<float>				x;
+				std::optional<float>				y;
+				std::optional<GUIItem::UnitType>	type;
 			};
 
 			struct Text
 			{
-				std::string			content;
-				std::string			fontFamily;
-				int					fontSize;
+				Text()
+				{
+
+				}
+			//private:
+				std::optional<std::string>		content;
+				std::optional<std::string>		fontFamily;
+				std::optional<int>				fontSize;
 			};
 
 			struct Background
 			{
-				Color		color;
+				std::optional<Color>			color;
 				// Should be able to load itself an image from a file via a specific method
 			};
 
@@ -115,6 +125,9 @@ namespace GXEZ
 				position.type = GUIItem::UnitType::ABSOLUTE_PX;
 				zIndex = 0;
 			}
+
+			// Load Default Needed values from parameters() ...
+			virtual void	LoadDefault();
 
 			// Text
 			Text		text;
@@ -158,11 +171,14 @@ namespace GXEZ
 		void				SetHovered(bool state);
 		const bool&			IsHovered() const;
 
+		void				SetSelected (bool state);
+		const bool&			IsSelected() const;
+
 		void				SetClicked(bool state);
 		const bool&			IsClicked() const;
 
-		void				SetVisibile(bool state);
-		const bool&			IsVisibile() const;
+		void				SetVisible(bool state);
+		const bool&			IsVisible() const;
 
 		void				SetZIndex(const int& zindex);
 		const int&			GetZIndex() const;
@@ -178,7 +194,7 @@ namespace GXEZ
 		virtual void		OnVisible(bool state) {};
 		
 
-		virtual void		CreateTextures() = 0;
+		virtual void		CreateTexture() = 0;
 		void				ClearTextures();
 
 		const Vec2i&		GetRealPosition() const;
@@ -186,7 +202,7 @@ namespace GXEZ
 
 		// Drawing/Design
 		GUIItem::Definition			_definition;
-		std::vector<ATexture2D*>	_textures;
+		ATexture2D*					_texture;
 		IRenderer*					_renderer;
 
 
@@ -197,7 +213,7 @@ namespace GXEZ
 
 
 		// Events
-		void					OnSizeChanged();
+		void					OnChanged();
 
 		// Compute Changes
 		void					ComputeRealPosition();
@@ -218,6 +234,7 @@ namespace GXEZ
 		AABB2i					_aabb;
 
 		// Drawing/Design Properties
+		bool					_isSelected;
 		bool					_isHovered;
 		bool					_isClicked;
 		bool					_isVisible;
@@ -227,7 +244,15 @@ namespace GXEZ
 	{
 	public:
 
-		struct DefinitionHovered
+		enum ModificatorID
+		{
+			GUIBUTTONMODIFICATOR_NONE_ID = 0,
+			GUIBUTTONMODIFICATOR_HOVERED_ID = 1,
+			GUIBUTTONMODIFICATOR_CLICKED_ID = 2,
+			GUIBUTTONMODIFICATOR_SELECTED_ID = 3,
+		};
+
+		struct DefinitionModificator
 		{
 			GUIItem::Definition::Border			border;
 			GUIItem::Definition::Background		background;
@@ -235,29 +260,17 @@ namespace GXEZ
 
 		struct Definition : public GUIItem::Definition
 		{
-			Definition()
-			{
-				size.width = 60;
-				size.height = 20;
+			Definition();
 
-				background.color = Color(200, 200, 200, 255);
-				border.size = 1;
-				border.radius = 10;
-				border.color = Color(170, 170, 170);
+			virtual void			LoadDefault() override;
 
-				// Hovered 
-				hovered.background.color = Color(215, 215, 240, 255);
-				hovered.border.size = 1;
-				hovered.border.radius = border.radius;
-				hovered.border.color = Color(190, 190, 220);
-				// Clicked
-				clicked.background.color = Color(235, 235, 235, 255);
-				clicked.border.size = 1;
-				clicked.border.radius = border.radius;
-				clicked.border.color = Color(230, 230, 245, 255);
-			}
-			DefinitionHovered hovered;
-			DefinitionHovered clicked;
+			DefinitionModificator	hovered;
+			DefinitionModificator	clicked;
+			DefinitionModificator	selected;
+
+		private:
+
+			void					LoadDefaultModificator(GUIButton::DefinitionModificator& modificator, const GUIButton::ModificatorID& id);
 		};
 
 		GUIButton(GUIManager* manager, GUIItem* parent, IRenderer* renderer, const GUIButton::Definition& definition);
@@ -283,11 +296,12 @@ namespace GXEZ
 
 
 		// Draw
-		virtual void	CreateTextures() override;
+		virtual void	CreateTexture() override;
 		ATexture2D*		CreateTextureBase(const GUIItem::Definition::Border& border, const GUIItem::Definition::Background& background);
 		void			CreateTextureNormal();
 		void			CreateTextureHovered();
 		void			CreateTextureClicked();
+		void			CreateTextureSelected();
 
 		GUIButton::Definition		_definitionButton;
 		// Texture 0 is Classic - Texture 1 is Hovered
@@ -302,7 +316,7 @@ namespace GXEZ
 		GUICanvas(GUIManager* manager, GUIItem* parent, IRenderer* renderer, const GUIItem::Definition& definition);
 	private:
 		virtual void	OnDraw(IRenderer* renderer) override;
-		virtual void	CreateTextures() override;
+		virtual void	CreateTexture() override;
 	};
 	//
 	//class GUIImage : public GUIItem
@@ -326,7 +340,7 @@ namespace GXEZ
 	//
 	//private:
 	//
-	//	virtual void	CreateTextures(IImageDrawer2D* drawer) override;
+	//	virtual void	CreateTexture(IImageDrawer2D* drawer) override;
 	//
 	//	GUIImage::Definition		_definition;
 	//	GUIImage::Definition		_definitionHovered;

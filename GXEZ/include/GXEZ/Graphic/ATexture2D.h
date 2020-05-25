@@ -1,7 +1,7 @@
 #pragma once
 
 // GXEZ
-#include "IDrawer2D.h"
+#include "GXEZ/Graphic/IDrawer2D.h"
 
 // MXEZ
 #include "MXEZ/Vec/Vec.h"
@@ -12,11 +12,12 @@ using namespace MXEZ;
 
 namespace GXEZ
 {
-	class IRenderer;
+	class ATexture2DManager;
 
 	class ATexture2D : public IDrawer2D
 	{
 	public:
+		friend class ATexture2DManager;
 
 		struct Definition
 		{
@@ -28,11 +29,13 @@ namespace GXEZ
 			std::string		file;
 		};
 		
-		ATexture2D(const Definition& definition, IRenderer* renderer);
+		ATexture2D(const Definition& definition, ATexture2DManager* manager);
 		virtual	~ATexture2D();
 
 		// Must Be Called before any draw call
-		virtual void		UseAsRenderTarget();
+		virtual void		UseAsRenderTarget(const bool& state = true);
+		virtual void		Save();
+		virtual void		Restore();
 
 		// Inherited via IDrawer2D
 		virtual void		DrawPoint(const Vec2i& pos, const Color& color) override;
@@ -52,7 +55,6 @@ namespace GXEZ
 		Vec2i					_center;
 
 	private:
-
-		IRenderer*				_renderer;
+		ATexture2DManager*		_manager;
 	};
 }

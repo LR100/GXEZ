@@ -196,7 +196,7 @@ namespace GXEZ
 		_evt.SetDefinition(_evtDef);
 		// !! HANDLE EVENT WITH ID DEVICE !!
 		HandleEvent(_evt.GetHash());
-		std::cout << "Event Window " << _evt.ToString();
+		// std::cout << "Event Window " << _evt.ToString();
 		// Then Set It for Handling WITHOUT Id Device
 		// This Procedure allow the user of EventHandler 
 		// to handle any kind of Window Event whatever the window it is

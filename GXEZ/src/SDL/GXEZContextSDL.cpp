@@ -41,8 +41,6 @@ namespace GXEZ
 		{
 			std::cerr << "GXEZContextSDL::Init() Couldn't initialize SDL_TTF: " << TTF_GetError() << std::endl;
 		}
-		
-		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 	}
 
 	IGXEZContext::Type GXEZContextSDL::GetType() const
